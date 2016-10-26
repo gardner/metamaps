@@ -377,7 +377,9 @@ const JIT = {
         onClick: function(node, eventInfo, e) {
           // remove the rightclickmenu
           $('.rightclickmenu').remove()
-
+          Create.newTopic.hide()
+          Filter.close()
+          
           if (Mouse.boxStartCoordinates) {
             if (e.ctrlKey) {
               Visualize.mGraph.busy = false
@@ -741,7 +743,9 @@ const JIT = {
     var self = JIT
 
     var authorized = Active.Map && Active.Map.authorizeToEdit(Active.Mapper)
-
+    Create.newTopic.hide()
+    Filter.close()
+    
     if (node && !node.nodeFrom) {
       self.handleSelectionBeforeDragging(node, e)
 
@@ -1038,9 +1042,6 @@ const JIT = {
         Control.deselectAllEdges()
         Control.deselectAllNodes()
       }
-    } else {
-      // SINGLE CLICK, resulting from pan
-      Create.newTopic.hide()
     }
   }, // canvasClickHandler
   updateTopicPositions: function(node, pos) {
