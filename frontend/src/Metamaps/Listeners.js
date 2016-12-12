@@ -30,6 +30,9 @@ const Listeners = {
         case 27: // if esc key is pressed
           JIT.escKeyHandler()
           break
+        case 46: // if DEL is pressed
+          Control.deleteSelected()
+          break
         case 65: // if a or A is pressed
           if ((e.ctrlKey || e.metaKey) && onCanvas) {
             const nodesCount = Object.keys(Visualize.mGraph.graph.nodes).length
