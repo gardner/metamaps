@@ -4,6 +4,7 @@ import $jit from '../patched/JIT'
 
 import Active from './Active'
 import AutoLayout from './AutoLayout'
+import Cable from './Cable'
 import Create from './Create'
 import DataModel from './DataModel'
 import Filter from './Filter'
@@ -43,6 +44,8 @@ const Topic = {
       DataModel.Synapses = new DataModel.SynapseCollection(data.synapses)
       DataModel.attachCollectionEvents()
 
+      DataModel.Topics.models.forEach(topic => Cable.subTopic(topic.id))
+
       document.title = Active.Topic.get('name') + ' | Metamaps'
 
       // set filter mapper H3 text
@@ -78,6 +81,7 @@ const Topic = {
       TopicCard.hideCard()
       SynapseCard.hideCard()
       Filter.close()
+      Cable.unsubAllTopics()
     }
   },
   centerOn: function(nodeid, callback) {

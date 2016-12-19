@@ -87,6 +87,10 @@ const Synapse = Backbone.Model.extend({
     if (mapper && (this.get('permission') === 'commons' || this.get('collaborator_ids').includes(mapper.get('id')) || this.get('user_id') === mapper.get('id'))) return true
     else return false
   },
+  authorizeToShow: function(mapper) {
+    if (this.get('permission') !== 'private' || (mapper && this.get('collaborator_ids').includes(mapper.get('id')) || this.get('user_id') === mapper.get('id'))) return true
+    else return false
+  },
   authorizePermissionChange: function(mapper) {
     if (mapper && this.get('user_id') === mapper.get('id')) return true
     else return false

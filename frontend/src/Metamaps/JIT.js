@@ -640,14 +640,14 @@ const JIT = {
       }
     },
     // this will just be used to patch the ForceDirected graphsettings with the few things which actually differ
-    background: {
+    /*background: {
       levelDistance: 200,
       numberOfCircles: 4,
       CanvasStyles: {
         strokeStyle: '#333',
         lineWidth: 1.5
       }
-    },
+    },*/
     levelDistance: 200
   },
   onMouseEnter: function(edge) {
