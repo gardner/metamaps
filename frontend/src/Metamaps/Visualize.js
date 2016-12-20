@@ -48,28 +48,9 @@ const Visualize = {
   computePositions: function() {
     const self = Visualize
 
+    JIT.connectModelsToGraph()
     if (self.type === 'RGraph') {
-      let i
-      let l
-
       self.mGraph.graph.eachNode(function(n) {
-        const topic = DataModel.Topics.get(n.id)
-        topic.set({ node: n }, { silent: true })
-        topic.updateNode()
-
-        n.eachAdjacency(function(edge) {
-          if (!edge.getData('init')) {
-            edge.setData('init', true)
-
-            l = edge.getData('synapseIDs').length
-            for (i = 0; i < l; i++) {
-              const synapse = DataModel.Synapses.get(edge.getData('synapseIDs')[i])
-              synapse.set({ edge: edge }, { silent: true })
-              synapse.updateEdge()
-            }
-          }
-        })
-
         var pos = n.getPos()
         pos.setc(-200, -200)
       })
@@ -77,23 +58,7 @@ const Visualize = {
     } else if (self.type === 'ForceDirected') {
       self.mGraph.graph.eachNode(function(n) {
         const topic = DataModel.Topics.get(n.id)
-        topic.set({ node: n }, { silent: true })
-        topic.updateNode()
         const mapping = topic.getMapping()
-
-        n.eachAdjacency(function(edge) {
-          if (!edge.getData('init')) {
-            edge.setData('init', true)
-
-            const l = edge.getData('synapseIDs').length
-            for (let i = 0; i < l; i++) {
-              const synapse = DataModel.Synapses.get(edge.getData('synapseIDs')[i])
-              synapse.set({ edge: edge }, { silent: true })
-              synapse.updateEdge()
-            }
-          }
-        })
-
         const startPos = new $jit.Complex(0, 0)
         const endPos = new $jit.Complex(mapping.get('xloc'), mapping.get('yloc'))
         n.setPos(startPos, 'start')
