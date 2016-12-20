@@ -90,6 +90,15 @@ class Topic < ApplicationRecord
     end
   end
 
+  def filtered
+    {
+      id: id,
+      permission: permission,
+      user_id: user_id,
+      collaborator_ids: collaborator_ids
+    }
+  end
+
   # TODO: move to a decorator?
   def synapses_csv(output_format = 'array')
     output = []

@@ -43,31 +43,21 @@ class Synapse < ApplicationRecord
     super(methods: [:user_name, :user_image, :collaborator_ids])
   end
 
-  def after_created
-    filteredSynapse = {
+  def filtered
+    {
       id: id,
       permission: permission,
       user_id: user_id,
       collaborator_ids: collaborator_ids
     }
-    filteredTopic1 = {
-      id: topic1_id,
-      permission: topic1.permission,
-      user_id: topic1.user_id,
-      collaborator_ids: topic1.collaborator_ids
-    }
-    filteredTopic2 = {
-      id: topic2_id,
-      permission: topic2.permission,
-      user_id: topic2.user_id,
-      collaborator_ids: topic2.collaborator_ids
-    }
+  end
+
+  def after_created
     data = {
-      synapse: filteredSynapse,
-      topic1: filteredTopic1,
-      topic2: filteredTopic2
+      synapse: filtered,
+      topic1: topic1.filtered,
+      topic2: topic2.filtered
     }
-    # include the filtered topics here too
     ActionCable.server.broadcast 'topic_' + topic1_id.to_s, type: 'newSynapse', data: data 
     ActionCable.server.broadcast 'topic_' + topic2_id.to_s, type: 'newSynapse', data: data 
   end

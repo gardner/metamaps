@@ -44,7 +44,7 @@ const Topic = {
       DataModel.Synapses = new DataModel.SynapseCollection(data.synapses)
       DataModel.attachCollectionEvents()
 
-      DataModel.Topics.models.forEach(topic => Cable.subTopic(topic.id))
+      Cable.subAllTopics()
 
       document.title = Active.Topic.get('name') + ' | Metamaps'
 
@@ -98,6 +98,62 @@ const Topic = {
       Active.Topic = DataModel.Topics.get(nodeid)
     }
   },
+  fetchForTopicView: function(synapseId) {
+    var self = this
+
+    var successCallback
+    successCallback = function(data) {
+      data = data.data
+      if (Visualize.mGraph.busy) {
+        // don't clash with centerOn
+        window.setTimeout(function() { successCallback(data) }, 100)
+        return
+      }
+      // todo: these won't work when the api works as expected
+      const topic1user = {
+        id: data.topic1.user_id,
+        image: data.topic1.user_image,
+        name: data.topic1.name
+      }   
+      const topic2user = {
+        id: data.topic2.user_id,
+        image: data.topic2.user_image,
+        name: data.topic2.name
+      }   
+      let creators = [data.user, topic1user, topic2user]
+      DataModel.Creators.add(creators)
+      DataModel.Topics.add(data.topic1)
+      DataModel.Topics.add(data.topic2)
+      Cable.subUnsubbedTopics(data.topic1.id, data.topic2.id)
+      var topicColl = new DataModel.TopicCollection([data.topic1, data.topic2])
+
+      data.topic1_id = data.topic1.id
+      data.topic2_id = data.topic2.id
+      data.user_id = data.user.id
+      delete data.topic1
+      delete data.topic2
+      delete data.user
+      DataModel.Synapses.add(data)
+      var synapseColl = new DataModel.SynapseCollection(data)
+
+      var graph = JIT.convertModelsToJIT(topicColl, synapseColl)[0]
+      console.log(graph)
+      Visualize.mGraph.op.sum(graph, {
+        type: 'fade',
+        duration: 500,
+        hideLabels: false
+      })
+      JIT.connectModelsToGraph()
+    }
+
+
+    $.ajax({
+      type: 'GET',
+      url: '/api/v2/synapses/' + synapseId + '?embed=topic1,topic2,user',
+      success: successCallback,
+      error: function() {}
+    })
+  },
   fetchRelatives: function(nodes, metacodeId) {
     var self = this
 
@@ -132,27 +188,8 @@ const Topic = {
         duration: 500,
         hideLabels: false
       })
+      JIT.connectModelsToGraph() 
 
-      var i, l, t, s
-
-      Visualize.mGraph.graph.eachNode(function(n) {
-        t = DataModel.Topics.get(n.id)
-        t.set({ node: n }, { silent: true })
-        t.updateNode()
-
-        n.eachAdjacency(function(edge) {
-          if (!edge.getData('init')) {
-            edge.setData('init', true)
-
-            l = edge.getData('synapseIDs').length
-            for (i = 0; i < l; i++) {
-              s = DataModel.Synapses.get(edge.getData('synapseIDs')[i])
-              s.set({ edge: edge }, { silent: true })
-              s.updateEdge()
-            }
-          }
-        })
-      })
       if ($.isArray(nodes) && nodes.length > 1) {
         self.fetchRelatives(nodes.slice(1), metacodeId)
       }

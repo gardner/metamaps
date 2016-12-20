@@ -2,6 +2,7 @@
 
 import Active from './Active'
 import DataModel from './DataModel'
+import Topic from './Topic'
 
 const Cable = {
   topicSubs: {},
@@ -12,6 +13,10 @@ const Cable = {
   subAllTopics: () => {
     let self = Cable
     DataModel.Topics.models.forEach(topic => self.subTopic(topic.id))  
+  },
+  subUnsubbedTopics: (topic1id, topic2id) => {
+    if (!Cable.topicSubs[topic1id]) Cable.subTopic(topic1id)
+    if (!Cable.topicSubs[topic2id]) Cable.subTopic(topic2id)
   },
   subTopic: id => {
     let self = Cable
@@ -36,13 +41,12 @@ const Cable = {
   },
   // begin event functions
   newSynapse: data => {
-    console.log(data)
     const m = Active.Mapper
     const s = new DataModel.Synapse(data.synapse)
     const t1 = new DataModel.Topic(data.topic1)
     const t2 = new DataModel.Topic(data.topic2)
     if (t1.authorizeToShow(m) && t2.authorizeToShow(m) && s.authorizeToShow(m)) {
-      console.log('authorized')
+      Topic.fetchForTopicView(data.synapse.id)
     }
   }
 }
