@@ -68,10 +68,22 @@ class Topic < ApplicationRecord
     Pundit.policy_scope(user, maps).map(&:id)
   end
 
+  def attachments_json
+    attachments.map do |a|
+      {
+        file_name: a.file_file_name,
+        content_type: a.file_content_type,
+        file_size: a.file_file_size,
+        url: a.file.url
+      }
+    end
+  end
+
   def as_json(options = {})
     super(methods: [:user_name, :user_image, :collaborator_ids])
       .merge(inmaps: inmaps(options[:user]), inmapsLinks: inmapsLinks(options[:user]),
-             map_count: map_count(options[:user]), synapse_count: synapse_count(options[:user]))
+             map_count: map_count(options[:user]), synapse_count: synapse_count(options[:user]),
+            attachments: attachments_json)
   end
 
   def as_rdf

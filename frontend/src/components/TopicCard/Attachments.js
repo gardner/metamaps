@@ -1,6 +1,7 @@
 import React, { PropTypes, Component } from 'react'
 
 import EmbedlyLink from './EmbedlyLink'
+import FileAttachments from './FileAttachments'
 
 class Attachments extends Component {
   render = () => {
@@ -11,6 +12,7 @@ class Attachments extends Component {
       <div className="attachments">
         <EmbedlyLink topicId={topic.id}
           link={link}
+        <FileAttachments attachments={topic.get('attachments')}
           authorizedToEdit={authorizedToEdit}
           updateTopic={updateTopic}
         />
