@@ -9,7 +9,7 @@ class FileAttachments extends Component {
       return 'pdf-file-type'
     } else if (content_type.match(/^image\//)) {
       return 'image-file-type'
-    } else if (content_type.match(/^audio\//)) {
+    } else if (content_type.match(/^audio\//) || content_type === 'video/ogg') {
       return 'audio-file-type'
     } else {
       return 'unknown-file-type'
@@ -24,7 +24,7 @@ class FileAttachments extends Component {
       return 'https://image.flaticon.com/icons/svg/29/29587.svg'
     } else if (file.content_type.match(/^image\//)) {
       return file.url
-    } else if (file.content_type.match(/^audio\//)) {
+    } else if (file.content_type.match(/^audio\//) || file.content_type === 'video/ogg') {
       return 'https://cdn0.iconfinder.com/data/icons/huge-business-vector-icons/60/music_notes-512.png'
     } else {
       return 'https://image.flaticon.com/icons/png/512/8/8235.png'
@@ -37,16 +37,18 @@ class FileAttachments extends Component {
 
   renderFile = (file, index) => {
     return (
-      <a key={index} 
+      <div key={index} 
         className={`file ${this.getFileTypeClass(file.content_type)}`}
-        href={file.url}
+        style={{ clear: 'both' }}
       >
-        <img src={this.getFileIcon(file)}
-          width="16" height="16"
-          style={{ float: 'left', paddingLeft: '0.5em', paddingRight: '0.5em' }}
-        />
-        {file.file_name}
-      </a>
+        <a href={file.url}>
+          <img src={this.getFileIcon(file)}
+            width="16" height="16"
+            style={{ float: 'left', paddingLeft: '0.5em', paddingRight: '0.5em' }}
+          />
+          {file.file_name}
+        </a>
+      </div>
     )
   }
 
