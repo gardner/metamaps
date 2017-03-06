@@ -4,10 +4,11 @@ RSpec.describe MapActivityService do
   let(:map) { create(:map, created_at: 1.week.ago) }
   let(:other_user) { create(:user) }
   let(:email_user) { create(:user) }
+  let(:empty_response) { {stats:{}} }
 
   it 'includes nothing if nothing happened' do
     response = MapActivityService.summarize_data(map, email_user)
-    expect(response[:stats]).to eq({})
+    expect(response).to eq (empty_response)
   end
 
   describe 'topics added to map' do
@@ -46,7 +47,7 @@ RSpec.describe MapActivityService do
       mapping2 = create(:mapping, user: other_user, map: map, mappable: topic, created_at: 5.hours.ago)
       Event.where(kind: 'topic_added_to_map').where("meta->>'mapping_id' = ?", mapping2.id.to_s).first.update_columns(created_at: 5.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
 
     it 'excludes a topic added outside the last 24 hours' do
@@ -54,7 +55,7 @@ RSpec.describe MapActivityService do
       mapping = create(:mapping, user: other_user, map: map, mappable: topic, created_at: 25.hours.ago)
       Event.find_by(kind: 'topic_added_to_map', eventable_id: topic.id).update_columns(created_at: 25.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
 
     it 'excludes topics added by the user who will receive the data' do
@@ -98,7 +99,7 @@ RSpec.describe MapActivityService do
       event = Events::TopicMovedOnMap.publish!(topic, map, other_user, {})
       event.update(created_at: 25.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
 
     it 'excludes ones moved by the user who will receive the data' do
@@ -106,7 +107,7 @@ RSpec.describe MapActivityService do
       event = Events::TopicMovedOnMap.publish!(topic, map, email_user, {})
       event.update(created_at: 5.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
   end
 
@@ -132,7 +133,7 @@ RSpec.describe MapActivityService do
       mapping.destroy
       Event.find_by(kind: 'topic_removed_from_map', eventable_id: topic.id).update_columns(created_at: 25.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
 
     it 'excludes topics removed by the user who will receive the data' do
@@ -191,7 +192,7 @@ RSpec.describe MapActivityService do
       mapping2 = create(:mapping, user: other_user, map: map, mappable: synapse, created_at: 5.hours.ago)
       Event.where(kind: 'synapse_added_to_map').where("meta->>'mapping_id' = ?", mapping2.id.to_s).first.update_columns(created_at: 5.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
 
     it 'excludes a synapse added outside the last 24 hours' do
@@ -199,7 +200,7 @@ RSpec.describe MapActivityService do
       mapping = create(:mapping, user: other_user, map: map, mappable: synapse, created_at: 25.hours.ago)
       Event.find_by(kind: 'synapse_added_to_map', eventable_id: synapse.id).update_columns(created_at: 25.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
 
     it 'excludes synapses added by the user who will receive the data' do
@@ -238,7 +239,7 @@ RSpec.describe MapActivityService do
       mapping.destroy
       Event.find_by(kind: 'synapse_removed_from_map', eventable_id: synapse.id).update_columns(created_at: 25.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
-      expect(response[:stats]).to eq ({})
+      expect(response).to eq (empty_response)
     end
 
     it 'excludes synapses removed by the user who will receive the data' do

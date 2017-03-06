@@ -1,33 +1,37 @@
 class MapActivityService
 
-  def self.summarize_data(map, user, till = DateTime.now)
+  def self.subject_line(map)
+    'Activity on map ' + map.name
+  end
+
+  def self.summarize_data(map, user, until_moment = DateTime.now)
     results = {
       stats: {}
     }
 
-    since = till - 24.hours
+    since = until_moment - 24.hours
 
     message_count = Message.where(resource: map)
-                           .where("created_at > ? AND created_at < ?", since, till)
+                           .where("created_at > ? AND created_at < ?", since, until_moment)
                            .where.not(user: user).count
     if message_count > 0
       results[:stats][:messages_sent] = message_count
     end
 
     moved_count = Event.where(kind: 'topic_moved_on_map', map: map)
-                       .where("created_at > ? AND created_at < ?", since, till)
+                       .where("created_at > ? AND created_at < ?", since, until_moment)
                        .where.not(user: user).group(:eventable_id).count
     if moved_count.keys.length > 0
       results[:stats][:topics_moved] = moved_count.keys.length
     end
 
     topics_added_events = Event.where(kind: 'topic_added_to_map', map: map)
-                               .where("created_at > ? AND created_at < ?", since, till)
+                               .where("created_at > ? AND created_at < ?", since, until_moment)
                                .where.not(user: user)
                                .order(:created_at)
 
     topics_removed_events = Event.where(kind: 'topic_removed_from_map', map: map)
-                                 .where("created_at > ? AND created_at < ?", since, till)
+                                 .where("created_at > ? AND created_at < ?", since, until_moment)
                                  .where.not(user: user)
                                  .order(:created_at)
 
@@ -54,12 +58,12 @@ class MapActivityService
     end
 
     synapses_added_events = Event.where(kind: 'synapse_added_to_map', map: map)
-                               .where("created_at > ? AND created_at < ?", since, till)
+                               .where("created_at > ? AND created_at < ?", since, until_moment)
                                .where.not(user: user)
                                .order(:created_at)
 
     synapses_removed_events = Event.where(kind: 'synapse_removed_from_map', map: map)
-                                 .where("created_at > ? AND created_at < ?", since, till)
+                                 .where("created_at > ? AND created_at < ?", since, until_moment)
                                  .where.not(user: user)
                                  .order(:created_at)
 
