@@ -75,6 +75,7 @@ RSpec.describe MapActivityService do
   describe 'topics moved on map' do
     it 'includes ones moved within the last 24 hours' do
       topic = create(:topic)
+      create(:mapping, user: email_user, map: map, mappable: topic, created_at: 5.hours.ago)
       event = Events::TopicMovedOnMap.publish!(topic, map, other_user, {})
       event.update(created_at: 6.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
@@ -84,6 +85,8 @@ RSpec.describe MapActivityService do
     it 'only includes each topic that was moved in the count once' do
       topic = create(:topic)
       topic2 = create(:topic)
+      create(:mapping, user: email_user, map: map, mappable: topic, created_at: 5.hours.ago)
+      create(:mapping, user: email_user, map: map, mappable: topic2, created_at: 5.hours.ago)
       event = Events::TopicMovedOnMap.publish!(topic, map, other_user, {})
       event.update(created_at: 6.hours.ago)
       event2 = Events::TopicMovedOnMap.publish!(topic, map, other_user, {})
@@ -96,6 +99,7 @@ RSpec.describe MapActivityService do
 
     it 'excludes ones moved outside the last 24 hours' do
       topic = create(:topic)
+      create(:mapping, user: email_user, map: map, mappable: topic, created_at: 5.hours.ago)
       event = Events::TopicMovedOnMap.publish!(topic, map, other_user, {})
       event.update(created_at: 25.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
@@ -104,6 +108,7 @@ RSpec.describe MapActivityService do
 
     it 'excludes ones moved by the user who will receive the data' do
       topic = create(:topic)
+      create(:mapping, user: email_user, map: map, mappable: topic, created_at: 5.hours.ago)
       event = Events::TopicMovedOnMap.publish!(topic, map, email_user, {})
       event.update(created_at: 5.hours.ago)
       response = MapActivityService.summarize_data(map, email_user)
@@ -262,54 +267,99 @@ RSpec.describe MapActivityService do
     end
   end
 
-  it 'handles permissions of topics and synapses' do
-    old_topic = nil
-    old_private_topic = nil
-    old_synapse = nil
-    old_private_synapse = nil
-    old_topic_mapping = nil
-    old_synapse_mapping = nil
-    old_private_topic_mapping = nil
-    old_private_synapse_mapping = nil
+  it 'handles permissions for topics added' do
     new_topic = nil
     new_private_topic = nil
-    new_synapse = nil
-    new_private_synapse = nil
+
+    Timecop.freeze(10.hours.ago) do
+      new_topic = create(:topic, permission: 'commons', user: other_user)
+      create(:mapping, map: map, mappable: new_topic, user: other_user)
+      new_private_topic = create(:topic, permission: 'private', user: other_user)
+      create(:mapping, map: map, mappable: new_private_topic, user: other_user)
+    end
+    Timecop.return
+
+    response = MapActivityService.summarize_data(map, email_user)
+    expect(response[:stats]).to eq({
+      topics_added: 1
+    })
+    expect(response[:topics_added].map(&:eventable_id)).to include(new_topic.id)
+    expect(response[:topics_added].map(&:eventable_id)).to_not include(new_private_topic.id)
+  end
+
+  it 'handles permissions for topics removed' do
+    old_topic = nil
+    old_private_topic = nil
+    old_topic_mapping = nil
+    old_private_topic_mapping = nil
 
     Timecop.freeze(2.days.ago) do
       old_topic = create(:topic, permission: 'commons', user: other_user)
       old_topic_mapping = create(:mapping, map: map, mappable: old_topic, user: other_user)
-      old_synapse = create(:synapse, permission: 'commons', user: other_user)
-      old_synapse_mapping = create(:mapping, map: map, mappable: old_synapse, user: other_user)
       old_private_topic = create(:topic, permission: 'private', user: other_user)
       old_private_topic_mapping = create(:mapping, map: map, mappable: old_private_topic, user: other_user)
+    end
+    Timecop.return
+
+    Timecop.freeze(10.hours.ago) do
+      # visible
+      old_topic_mapping.updated_by = other_user
+      old_topic_mapping.destroy
+      # not visible
+      old_private_topic_mapping.updated_by = other_user
+      old_private_topic_mapping.destroy
+    end
+    Timecop.return
+
+    response = MapActivityService.summarize_data(map, email_user)
+    expect(response[:stats]).to eq({
+      topics_removed: 1
+    })
+    expect(response[:topics_removed].map(&:eventable_id)).to include(old_topic.id)
+    expect(response[:topics_removed].map(&:eventable_id)).to_not include(old_private_topic.id)
+  end
+
+  it 'handles permissions for synapses added' do
+    new_synapse = nil
+    new_private_synapse = nil
+
+    Timecop.freeze(10.hours.ago) do
+      # visible
+      new_synapse = create(:synapse, permission: 'commons', user: other_user)
+      create(:mapping, map: map, mappable: new_synapse, user: other_user)
+      # not visible
+      new_private_synapse = create(:synapse, permission: 'private', user: other_user)
+      create(:mapping, map: map, mappable: new_private_synapse, user: other_user)
+    end
+    Timecop.return
+
+    response = MapActivityService.summarize_data(map, email_user)
+    expect(response[:stats]).to eq({
+      synapses_added: 1
+    })
+    expect(response[:synapses_added].map(&:eventable_id)).to include(new_synapse.id)
+    expect(response[:synapses_added].map(&:eventable_id)).to_not include(new_private_synapse.id)
+  end
+
+  it 'handles permissions for synapses removed' do
+    old_synapse = nil
+    old_private_synapse = nil
+    old_synapse_mapping = nil
+    old_private_synapse_mapping = nil
+
+    Timecop.freeze(2.days.ago) do
+      old_synapse = create(:synapse, permission: 'commons', user: other_user)
+      old_synapse_mapping = create(:mapping, map: map, mappable: old_synapse, user: other_user)
       old_private_synapse = create(:synapse, permission: 'private', user: other_user)
       old_private_synapse_mapping = create(:mapping, map: map, mappable: old_private_synapse, user: other_user)
     end
     Timecop.return
 
     Timecop.freeze(10.hours.ago) do
-      # ADDITIONS
       # visible
-      new_topic = create(:topic, permission: 'commons', user: other_user)
-      create(:mapping, map: map, mappable: new_topic, user: other_user)
-      new_synapse = create(:synapse, permission: 'commons', user: other_user)
-      create(:mapping, map: map, mappable: new_synapse, user: other_user)
-      # not visible
-      new_private_topic = create(:topic, permission: 'private', user: other_user)
-      create(:mapping, map: map, mappable: new_private_topic, user: other_user)
-      new_private_synapse = create(:synapse, permission: 'private', user: other_user)
-      create(:mapping, map: map, mappable: new_private_synapse, user: other_user)
-
-      # REMOVALS
-      # visible
-      old_topic_mapping.updated_by = other_user
-      old_topic_mapping.destroy
       old_synapse_mapping.updated_by = other_user
       old_synapse_mapping.destroy
       # not visible
-      old_private_topic_mapping.updated_by = other_user
-      old_private_topic_mapping.destroy
       old_private_synapse_mapping.updated_by = other_user
       old_private_synapse_mapping.destroy
     end
@@ -317,17 +367,8 @@ RSpec.describe MapActivityService do
 
     response = MapActivityService.summarize_data(map, email_user)
     expect(response[:stats]).to eq({
-      topics_added: 1,
-      synapses_added: 1,
-      topics_removed: 1,
       synapses_removed: 1
     })
-    expect(response[:topics_added].map(&:eventable_id)).to include(new_topic.id)
-    expect(response[:topics_added].map(&:eventable_id)).to_not include(new_private_topic.id)
-    expect(response[:synapses_added].map(&:eventable_id)).to include(new_synapse.id)
-    expect(response[:synapses_added].map(&:eventable_id)).to_not include(new_private_synapse.id)
-    expect(response[:topics_removed].map(&:eventable_id)).to include(old_topic.id)
-    expect(response[:topics_removed].map(&:eventable_id)).to_not include(old_private_topic.id)
     expect(response[:synapses_removed].map(&:eventable_id)).to include(old_synapse.id)
     expect(response[:synapses_removed].map(&:eventable_id)).to_not include(old_private_synapse.id)
   end
