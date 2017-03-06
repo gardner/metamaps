@@ -52,5 +52,6 @@
 
   <hr>
   <p style="font-size: 14px;">Make sense with Metamaps</p>
+  <%= link_to 'Unfollow this map', unfollow_from_email_map_url(@map) %>
   <%= render partial: 'shared/mailer_unsubscribe_link' %>
 </div>
