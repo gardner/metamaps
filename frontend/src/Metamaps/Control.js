@@ -21,17 +21,17 @@ const Control = {
     Selected.Nodes.push(node)
   },
   selectNeighbors: function() {
-    if(Selected.Nodes.length > 0){
+    if (Selected.Nodes.length > 0) {
       //For each selected node, select all connected node and the synapses too
       Selected.Nodes.forEach((item) => {
-        if(Visualize.mGraph.graph.getNode(item.id).adjacencies){
-          for(var adjID in Visualize.mGraph.graph.getNode(item.id).adjacencies){
+        if (Visualize.mGraph.graph.getNode(item.id).adjacencies) {
+          for (const adjID in Visualize.mGraph.graph.getNode(item.id).adjacencies) {
             Control.selectNode(Visualize.mGraph.graph.getNode(adjID))
             Control.selectEdge(Visualize.mGraph.graph.getNode(item.id).adjacencies[adjID])
           }
         }
       })
-      
+
       Visualize.mGraph.plot()
     }
   },
