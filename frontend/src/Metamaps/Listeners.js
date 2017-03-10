@@ -31,6 +31,11 @@ const Listeners = {
         case 27: // if esc key is pressed
           JIT.escKeyHandler()
           break
+        case 38: // if UP key is pressed
+          if(e.ctrlKey && e.shiftKey){
+            Control.selectNeighbors()
+          }
+          break
         case 46: // if DEL is pressed
           if(e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA" && (Selected.Nodes.length + Selected.Edges.length) > 0){
             e.preventDefault()
