@@ -4,6 +4,7 @@ import EmbedlyLinkChooser from './EmbedlyLinkChooser'
 import EmbedlyCard from './EmbedlyCard'
 import FileUploader from './FileUploader'
 import PhotoUploader from './PhotoUploader'
+import AudioUploader from './AudioUploader'
 
 class Attachments extends Component {
   constructor(props) {
@@ -63,7 +64,11 @@ class Attachments extends Component {
         />
       )
     } else if (this.state.addingAudio) {
-      childComponent = null
+      childComponent = (
+        <AudioUploader updateTopic={updateTopic}
+          cancel={this.clearAttachments}
+        />
+      )
     } else if (this.state.addingFile) {
       childComponent = (
         <FileUploader updateTopic={updateTopic}
