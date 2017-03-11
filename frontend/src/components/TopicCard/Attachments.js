@@ -3,6 +3,7 @@ import React, { PropTypes, Component } from 'react'
 import EmbedlyLinkChooser from './EmbedlyLinkChooser'
 import EmbedlyCard from './EmbedlyCard'
 import FileUploader from './FileUploader'
+import PhotoUploader from './PhotoUploader'
 
 class Attachments extends Component {
   constructor(props) {
@@ -50,7 +51,11 @@ class Attachments extends Component {
     } else if (!authorizedToEdit) {
       childComponent = null
     } else if (this.state.addingPhoto) {
-      childComponent = null
+      childComponent = (
+        <PhotoUploader updateTopic={updateTopic}
+          cancel={this.clearAttachments}
+        />
+      )
     } else if (this.state.addingLink) {
       childComponent = (
         <EmbedlyLinkChooser updateTopic={updateTopic}
