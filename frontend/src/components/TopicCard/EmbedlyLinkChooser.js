@@ -12,6 +12,7 @@ class EmbedlyLinkChooser extends Component {
 
   resetLink = () => {
     this.setState({ linkEdit: '' })
+    this.props.cancel()
   }
 
   onLinkChangeHandler = e => {
@@ -41,7 +42,7 @@ class EmbedlyLinkChooser extends Component {
               value={linkEdit}
               onChange={this.onLinkChangeHandler}
               onKeyUp={this.onLinkKeyUpHandler}></input>
-            {linkEdit && <div id="addLinkReset" onClick={this.resetLink}></div>}
+            <div id="addLinkReset" onClick={this.resetLink}></div>
           </div>
         </div>
 <<<<<<< HEAD:frontend/src/components/TopicCard/EmbedlyLink/index.js
@@ -67,7 +68,8 @@ EmbedlyLink.propTypes = {
 EmbedlyLinkChooser.propTypes = {
 >>>>>>> start implementing the 4-choice file uploader:frontend/src/components/TopicCard/EmbedlyLinkChooser.js
   authorizedToEdit: PropTypes.bool,
-  updateTopic: PropTypes.func
+  updateTopic: PropTypes.func,
+  cancel: PropTypes.func
 }
 
 export default EmbedlyLinkChooser

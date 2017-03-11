@@ -18,9 +18,13 @@ class Attachments extends Component {
     addingFile: false
   }
 
+  clearState = () => {
+    this.setState(this.defaultState)
+  }
+
   clearAttachments = () => {
     this.props.updateTopic({ link: null }) // attachments too
-    this.setState(this.defaultState)
+    this.clearState()
   }
 
   // onClick handler for the 4 buttons, which triggers showing the proper uploader
@@ -38,7 +42,7 @@ class Attachments extends Component {
       childComponent = (
         <EmbedlyCard link={link}
           authorizedToEdit={authorizedToEdit}
-          removeLink={this.clearAttachments}
+          removeLink={this.clearState}
         />
       )
     } else if (file) {
@@ -49,6 +53,7 @@ class Attachments extends Component {
       childComponent = (
         <EmbedlyLinkChooser authorizedToEdit={authorizedToEdit}
           updateTopic={updateTopic}
+          cancel={this.clearAttachments}
         />
       )
     } else if (this.state.addingAudio && authorizedToEdit) {
