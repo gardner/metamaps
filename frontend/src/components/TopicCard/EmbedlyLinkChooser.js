@@ -31,7 +31,6 @@ class EmbedlyLinkChooser extends Component {
   render = () => {
     const { linkEdit } = this.state
 
-    if (!this.props.authorizedToEdit) return null
     return (
       <div className="link-chooser">
         <div className="addLink">
@@ -42,32 +41,15 @@ class EmbedlyLinkChooser extends Component {
               value={linkEdit}
               onChange={this.onLinkChangeHandler}
               onKeyUp={this.onLinkKeyUpHandler}></input>
-            <div id="addLinkReset" onClick={this.resetLink}></div>
+            <div className="attachment-cancel" onClick={this.resetLink}></div>
           </div>
         </div>
-<<<<<<< HEAD:frontend/src/components/TopicCard/EmbedlyLink/index.js
-        {link && <Card key={topicId} link={link} />}
-        {authorizedToEdit && (
-          <div id="linkremove"
-            style={{ display: hasAttachment ? 'block' : 'none' }}
-            onClick={this.removeLink}
-          />
-        )}
-=======
->>>>>>> start implementing the 4-choice file uploader:frontend/src/components/TopicCard/EmbedlyLinkChooser.js
       </div>
     )
   }
 }
 
-<<<<<<< HEAD:frontend/src/components/TopicCard/EmbedlyLink/index.js
-EmbedlyLink.propTypes = {
-  topicId: PropTypes.number,
-  link: PropTypes.string,
-=======
 EmbedlyLinkChooser.propTypes = {
->>>>>>> start implementing the 4-choice file uploader:frontend/src/components/TopicCard/EmbedlyLinkChooser.js
-  authorizedToEdit: PropTypes.bool,
   updateTopic: PropTypes.func,
   cancel: PropTypes.func
 }

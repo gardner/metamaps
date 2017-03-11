@@ -625,16 +625,31 @@ background-color: #E0E0E0;
  z-index:100;
 }
 
+.attachments {
+  position: relative;
+}
+
+.upload-file-dropzone,
+.CardOnGraph .attachment-type-chooser > div {
+  text-align: center;
+  color: #cccccc;
+  font-size: 12px;
+
+  &:hover {
+    color: #999999;
+  }
+}
+
 .CardOnGraph .attachment-type-chooser {
   & > div {
     display: inline-block;
     width: 25%;
     text-align: center;
-    color: #cccccc; /* TODO fix color */
+    color: #cccccc;
     font-size: 12px;
 
     &:hover {
-      color: #999999; /* TODO fix color */
+      color: #999999;
     }
   }
 }
@@ -735,7 +750,7 @@ font-family: 'din-regular', helvetica, sans-serif;
   z-index: 1;
 }
 
-#addLinkReset {
+.attachment-cancel {
   position: absolute;
   top: 8px;
   right: 15px;

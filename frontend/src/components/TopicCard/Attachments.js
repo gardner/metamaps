@@ -2,7 +2,7 @@ import React, { PropTypes, Component } from 'react'
 
 import EmbedlyLinkChooser from './EmbedlyLinkChooser'
 import EmbedlyCard from './EmbedlyCard'
-import FileAttachments from './FileAttachments'
+import FileUploader from './FileUploader'
 
 class Attachments extends Component {
   constructor(props) {
@@ -46,20 +46,25 @@ class Attachments extends Component {
         />
       )
     } else if (file) {
-      childComponent = null//renderFile()
-    } else if (this.state.addingPhoto && authorizedToEdit) {
-      childComponent = null//renderPhotoUploader()
-    } else if (this.state.addingLink && authorizedToEdit) {
+      childComponent = null
+    } else if (!authorizedToEdit) {
+      childComponent = null
+    } else if (this.state.addingPhoto) {
+      childComponent = null
+    } else if (this.state.addingLink) {
       childComponent = (
-        <EmbedlyLinkChooser authorizedToEdit={authorizedToEdit}
-          updateTopic={updateTopic}
+        <EmbedlyLinkChooser updateTopic={updateTopic}
           cancel={this.clearAttachments}
         />
       )
-    } else if (this.state.addingAudio && authorizedToEdit) {
-      childComponent = null//renderAudioUploader()
-    } else if (this.state.addingFile && authorizedToEdit) {
-      childComponent = null//renderFileUploader()
+    } else if (this.state.addingAudio) {
+      childComponent = null
+    } else if (this.state.addingFile) {
+      childComponent = (
+        <FileUploader updateTopic={updateTopic}
+          cancel={this.clearAttachments}
+        />
+      )
     } else {
       childComponent = (
         <div className="attachment-type-chooser">
@@ -70,11 +75,6 @@ class Attachments extends Component {
         </div>
       )
     }
-
-    //    <FileAttachments attachments={topic.get('attachments')}
-    //      authorizedToEdit={authorizedToEdit}
-    //      removeLink={this.clearAttachments}
-    //    />
 
     return (
       <div className="attachments">
