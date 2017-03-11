@@ -31,8 +31,7 @@ class Attachments extends Component {
     let childComponent
     if (link) {
       childComponent = (
-        <EmbedlyCard key={topic.id}
-          link={link}
+        <EmbedlyCard link={link}
           authorizedToEdit={authorizedToEdit}
           removeLink={this.clearAttachments}
         />
@@ -43,8 +42,7 @@ class Attachments extends Component {
       childComponent = null//renderPhotoUploader()
     } else if (this.state.addingLink && authorizedToEdit) {
       childComponent = (
-        <EmbedlyLinkChooser topicId={topic.id}
-          authorizedToEdit={authorizedToEdit}
+        <EmbedlyLinkChooser authorizedToEdit={authorizedToEdit}
           updateTopic={updateTopic}
         />
       )
@@ -54,8 +52,7 @@ class Attachments extends Component {
       childComponent = null//renderFileUploader()
     } else {
       childComponent = (
-        <EmbedlyLinkChooser topicId={topic.id}
-          authorizedToEdit={authorizedToEdit}
+        <EmbedlyLinkChooser authorizedToEdit={authorizedToEdit}
           updateTopic={updateTopic}
         />
       )

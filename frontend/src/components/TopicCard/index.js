@@ -47,7 +47,8 @@ class ReactTopicCard extends Component {
               authorizedToEdit={authorizedToEdit}
               onChange={wrappedUpdateTopic}
             />
-            <Attachments topic={topic}
+            <Attachments key={topic.id}
+              topic={topic}
               authorizedToEdit={authorizedToEdit}
               updateTopic={wrappedUpdateTopic}
             />
