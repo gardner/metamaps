@@ -12,15 +12,20 @@ class Attachments extends Component {
   }
 
   defaultState = {
-    addingFile: false,
     addingPhoto: false,
     addingLink: false,
-    addingUpload: false
+    addingAudio: false,
+    addingFile: false
   }
 
   clearAttachments = () => {
     this.props.updateTopic({ link: null }) // attachments too
     this.setState(this.defaultState)
+  }
+
+  // onClick handler for the 4 buttons, which triggers showing the proper uploader
+  choose = key => () => {
+    this.setState(Object.assign({}, this.defaultState, { [key]: true }))
   }
 
   render = () => {
@@ -52,9 +57,12 @@ class Attachments extends Component {
       childComponent = null//renderFileUploader()
     } else {
       childComponent = (
-        <EmbedlyLinkChooser authorizedToEdit={authorizedToEdit}
-          updateTopic={updateTopic}
-        />
+        <div className="attachment-type-chooser">
+          <div className="photo-upload" onClick={this.choose('addingPhoto')}>Photo</div>
+          <div className="link-upload" onClick={this.choose('addingLink')}>Link</div>
+          <div className="audio-upload" onClick={this.choose('addingAudio')}>Audio</div>
+          <div className="file-upload" onClick={this.choose('addingFile')}>Upload</div>
+        </div>
       )
     }
 
