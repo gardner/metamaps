@@ -196,8 +196,6 @@
 
 .CardOnGraph .links {
   position: relative;
-  border-bottom: 1px solid #BDBDBD;
-  border-top: 1px solid #BDBDBD;
   background-color: #e0e0e0;
 
   .linkItem {
@@ -626,7 +624,9 @@ background-color: #E0E0E0;
 }
 
 .attachments {
+  border-top: 1px solid #bdbdbd;
   position: relative;
+  height: 3em;
 }
 
 .upload-file-dropzone,
@@ -640,7 +640,12 @@ background-color: #E0E0E0;
   }
 }
 
+.upload-file-dropzone {
+  padding-top: 0.75em;
+}
+
 .CardOnGraph .attachment-type-chooser {
+  padding-top: .75em;
   & > div {
     display: inline-block;
     width: 25%;
@@ -663,7 +668,6 @@ background-color: #E0E0E0;
   width:100%;
   height:47px;
   position: relative;
-  border-top: 1px solid #BDBDBD;
 }
 
 .link-chooser a {
