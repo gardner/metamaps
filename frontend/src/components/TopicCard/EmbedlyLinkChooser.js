@@ -1,19 +1,13 @@
 /* global embedly */
 import React, { PropTypes, Component } from 'react'
 
-import Card from './Card'
-
-class EmbedlyLink extends Component {
+class EmbedlyLinkChooser extends Component {
   constructor(props) {
     super(props)
 
     this.state = {
       linkEdit: ''
     }
-  }
-
-  removeLink = () => {
-    this.props.updateTopic({ link: null })
   }
 
   resetLink = () => {
@@ -34,17 +28,12 @@ class EmbedlyLink extends Component {
   }
 
   render = () => {
-    const { link, authorizedToEdit, topicId } = this.props
     const { linkEdit } = this.state
-    const hasAttachment = !!link
 
-    if (!hasAttachment && !authorizedToEdit) return null
-
+    if (!this.props.authorizedToEdit) return null
     return (
-      <div className={hasAttachment ? 'embeds' : 'link-adder'}>
-        <div className="addLink"
-          style={{ display: hasAttachment ? 'none' : 'block' }}
-        >
+      <div className="link-chooser">
+        <div className="addLink">
           <div id="addLinkIcon"></div>
           <div id="addLinkInput">
             <input ref={input => (this.linkInput = input)}
@@ -55,6 +44,7 @@ class EmbedlyLink extends Component {
             {linkEdit && <div id="addLinkReset" onClick={this.resetLink}></div>}
           </div>
         </div>
+<<<<<<< HEAD:frontend/src/components/TopicCard/EmbedlyLink/index.js
         {link && <Card key={topicId} link={link} />}
         {authorizedToEdit && (
           <div id="linkremove"
@@ -62,16 +52,22 @@ class EmbedlyLink extends Component {
             onClick={this.removeLink}
           />
         )}
+=======
+>>>>>>> start implementing the 4-choice file uploader:frontend/src/components/TopicCard/EmbedlyLinkChooser.js
       </div>
     )
   }
 }
 
+<<<<<<< HEAD:frontend/src/components/TopicCard/EmbedlyLink/index.js
 EmbedlyLink.propTypes = {
   topicId: PropTypes.number,
   link: PropTypes.string,
+=======
+EmbedlyLinkChooser.propTypes = {
+>>>>>>> start implementing the 4-choice file uploader:frontend/src/components/TopicCard/EmbedlyLinkChooser.js
   authorizedToEdit: PropTypes.bool,
   updateTopic: PropTypes.func
 }
 
-export default EmbedlyLink
+export default EmbedlyLinkChooser
