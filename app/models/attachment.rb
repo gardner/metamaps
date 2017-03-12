@@ -14,6 +14,7 @@ class Attachment < ApplicationRecord
                       end
                     }
 
+  validates :attachable, presence: true
   validates_attachment_content_type :file, content_type: Attachable.allowed_types
 
   def image?

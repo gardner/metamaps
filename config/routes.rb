@@ -89,6 +89,7 @@ Metamaps::Application.routes.draw do
       post :follow, default: { format: :json }
       post :unfollow, default: { format: :json }
       get  :unfollow_from_email
+      resources :attachments, only: [:create, :destroy], shallow: true
     end
     collection do
       get :autocomplete_topic
@@ -120,6 +121,7 @@ Metamaps::Application.routes.draw do
 
   namespace :api, path: '/api', default: { format: :json } do
     namespace :v2, path: '/v2' do
+      resources :attachments, only: [:index, :show]
       resources :metacodes, only: [:index, :show]
       resources :mappings, only: [:index, :create, :show, :update, :destroy]
       resources :maps, only: [:index, :create, :show, :update, :destroy] do
