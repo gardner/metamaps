@@ -12,10 +12,13 @@ import DataModelMap from '../DataModel/Map'
 import Filter from '../Filter'
 import GlobalUI, { ReactApp } from '../GlobalUI'
 import JIT from '../JIT'
+import Listeners from '../Listeners'
 import Loading from '../Loading'
+import Organize from '../Organize'
 import Realtime from '../Realtime'
 import Selected from '../Selected'
 import SynapseCard from '../SynapseCard'
+import Topic from '../Topic'
 import TopicCard from '../Views/TopicCard'
 import Visualize from '../Visualize'
 
@@ -90,10 +93,40 @@ const Map = {
   },
   launch: function(id) {
     const self = Map
+    
+    const newMap = {
+      Active: null,
+      AutoLayout: null,
+      Cable: null,
+      Control: null,
+      Create: null,
+      DataModel: null,
+      Filter: null,
+      Import: null,
+      JIT: null,
+      Listeners: null,
+      Loading: null,
+      Map: null,
+      Mouse: null,
+      Organize: null,
+      PasteInput: null,
+      Realtime: null,
+      Selected: null,
+      Settings: null,
+      Synapse: null,
+      SynapseCard: null,
+      Topic: null,
+      Views: null,
+      Visualize: null
+    }
+    newMap.JIT = JIT(newMap)
+    newMap.Listeners = Listeners(newMap)
+    console.log(newMap)
+    
     var dataIsReadySetupMap = function() {
       Map.setAccessRequest()
       Visualize.type = 'ForceDirected'
-      JIT.prepareVizData()
+      newMap.JIT.prepareVizData()
       Selected.reset()
       InfoBox.load()
       Filter.reset()

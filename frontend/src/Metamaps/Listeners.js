@@ -1,18 +1,10 @@
 /* global $ */
 
-import Active from './Active'
-import Create from './Create'
-import Control from './Control'
-import DataModel from './DataModel'
-import JIT from './JIT'
-import Realtime from './Realtime'
-import Selected from './Selected'
-import Topic from './Topic'
 import Util from './Util'
-import Visualize from './Visualize'
 import { Search } from './GlobalUI'
 
-const Listeners = {
+const Listeners = ({ Active, Create, Control, DataModel, JIT, Realtime, Selected, Topic, Visualize }) => {
+return {
   init: function() {
     var self = this
     $(document).on('keydown', function(e) {
@@ -160,6 +152,7 @@ const Listeners = {
       Topic.fetchRelatives(nodes)
     }
   }
+}
 }
 
 export default Listeners

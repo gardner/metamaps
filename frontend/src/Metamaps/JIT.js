@@ -10,26 +10,16 @@ import $jit from '../patched/JIT'
 
 import MetacodeSelect from '../components/MetacodeSelect'
 
-import Active from './Active'
-import Control from './Control'
-import Create from './Create'
-import DataModel from './DataModel'
-import Filter from './Filter'
 import GlobalUI, { ReactApp } from './GlobalUI'
-import Map from './Map'
-import Mouse from './Mouse'
-import Selected from './Selected'
 import Settings from './Settings'
-import Synapse from './Synapse'
-import SynapseCard from './SynapseCard'
-import Topic from './Topic'
-import TopicCard from './Views/TopicCard'
 import Util from './Util'
-import Visualize from './Visualize'
 
 let panningInt
 
-const JIT = {
+const JIT = ({ Active, Control, Create, DataModel, Filter, Map, Mouse, Selected, Synapse,
+             SynapseCard, Topic, TopicCard, Visualize }) => {
+  
+return {
   tempInit: false,
   tempNode: null,
   tempNode2: null,
@@ -1976,6 +1966,7 @@ const JIT = {
       })
     }
   }
+}
 }
 
 export default JIT
