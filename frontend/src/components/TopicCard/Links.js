@@ -25,7 +25,6 @@ class Links extends Component {
     this.props.updateTopic({
       metacode_id: metacodeId
     })
-    this.props.redrawCanvas()
   }
 
   toggleShowMoreMaps = e => {
@@ -155,8 +154,7 @@ Links.propTypes = {
       icon_path: PropTypes.string, // url
       name: PropTypes.string
     }))
-  })),
-  redrawCanvas: PropTypes.func
+  }))
 }
 
 export default Links
