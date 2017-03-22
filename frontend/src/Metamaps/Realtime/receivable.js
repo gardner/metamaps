@@ -9,12 +9,12 @@ import { JUNTO_UPDATED } from './events'
 import Active from '../Active'
 import { ChatView } from '../Views'
 import DataModel from '../DataModel'
-import GlobalUI from '../GlobalUI'
+import GlobalUI, { ReactApp } from '../GlobalUI'
 import Util from '../Util'
 import Visualize from '../Visualize'
 
 export const juntoUpdated = self => state => {
-  self.juntoState = state
+  ReactApp.juntoState = state
   $(document).trigger(JUNTO_UPDATED)
 }
 

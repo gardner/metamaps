@@ -1,13 +1,11 @@
 /* global $ */
-import Active from './Active'
-import Control from './Control'
 import Mapper from './Mapper'
-import Visualize from './Visualize'
 
-const SynapseCard = {
+const SynapseCard = ({Active, Control, Visualize}) => {
+const toExport = {
   openSynapseCard: null,
   showCard: function(edge, e) {
-    var self = SynapseCard
+    var self = toExport
 
     // reset so we don't interfere with other edges, but first, save its x and y
     var myX = $('#edit_synapse').css('left')
@@ -53,11 +51,11 @@ const SynapseCard = {
 
   hideCard: function() {
     $('#edit_synapse').remove()
-    SynapseCard.openSynapseCard = null
+    toExport.openSynapseCard = null
   },
 
   populateShowCard: function(edge, synapse) {
-    var self = SynapseCard
+    var self = toExport
 
     self.add_synapse_count(edge)
     self.add_desc_form(synapse)
@@ -156,7 +154,7 @@ const SynapseCard = {
         var index = parseInt($(this).attr('data-synapse-index'))
         edge.setData('displayIndex', index)
         Visualize.mGraph.plot()
-        SynapseCard.showCard(edge, false)
+        toExport.showCard(edge, false)
       })
     }
   },
@@ -290,6 +288,8 @@ const SynapseCard = {
       })
     } // if
   } // add_direction_form
+}
+return toExport
 }
 
 export default SynapseCard

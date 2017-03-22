@@ -2,27 +2,15 @@
 
 import $jit from '../patched/JIT'
 
-import Active from './Active'
-import AutoLayout from './AutoLayout'
-import Create from './Create'
-import DataModel from './DataModel'
-import Filter from './Filter'
 import GlobalUI, { ReactApp } from './GlobalUI'
-import JIT from './JIT'
 import Loading from './Loading'
-import Map from './Map'
-import Selected from './Selected'
 import Settings from './Settings'
-import SynapseCard from './SynapseCard'
-import TopicCard from './Views/TopicCard'
 import Util from './Util'
-import Visualize from './Visualize'
 
 const noOp = () => {}
 
-const Topic = {
-  // this function is to retrieve a topic JSON object from the database
-  // @param id = the id of the topic to retrieve
+const Topic = ({Active, AutoLayout, Create, DataModel, Filter, JIT, MAP, Selected, SynapseCard, TopicCard, Visualize}) => {
+const toExport = {
   get: function(id, callback = noOp) {
     // if the desired topic is not yet in the local topic repository, fetch it
     if (DataModel.Topics.get(id) === undefined) {
@@ -101,7 +89,7 @@ const Topic = {
     ReactApp.render()
   },
   fetchRelatives: function(nodes, metacodeId) {
-    var self = this
+    var self = toExport
 
     var node = $.isArray(nodes) ? nodes[0] : nodes
 
@@ -292,7 +280,7 @@ const Topic = {
     }
   },
   createTopicLocally: function() {
-    var self = Topic
+    var self = toExport
 
     if (Create.newTopic.name === '') {
       GlobalUI.notifyUser('Please enter a topic title...')
@@ -330,7 +318,7 @@ const Topic = {
     self.renderTopic(mapping, topic, true, true) // this function also includes the creation of the topic in the database
   },
   getTopicFromAutocomplete: function(id) {
-    var self = Topic
+    var self = toExport
 
     Map.setHasLearnedTopicCreation(true)
 
@@ -357,7 +345,7 @@ const Topic = {
     })
   },
   getMapFromAutocomplete: function(data) {
-    var self = Topic
+    var self = toExport
 
     $(document).trigger(Map.events.editedByActiveMapper)
 
@@ -387,7 +375,7 @@ const Topic = {
     if (Create.newTopic.pinned) Create.newTopic.beingCreated = true
   },
   getTopicFromSearch: function(event, id) {
-    var self = Topic
+    var self = toExport
 
     $(document).trigger(Map.events.editedByActiveMapper)
 
@@ -408,6 +396,8 @@ const Topic = {
     event.preventDefault()
     return false
   }
+}
+return toExport
 }
 
 export default Topic

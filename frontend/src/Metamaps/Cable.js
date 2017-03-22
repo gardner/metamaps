@@ -2,24 +2,13 @@
 
 import { indexOf } from 'lodash'
 
-import Active from './Active'
-import Control from './Control'
-import DataModel from './DataModel'
-import Map from './Map'
 import Mapper from './Mapper'
-import Synapse from './Synapse'
-import Topic from './Topic'
-import { ChatView } from './Views'
-import Visualize from './Visualize'
 
-const Cable = {
-  init: () => {
-    let self = Cable
-    self.cable = ActionCable.createConsumer()
-  },
+const Cable = ({Active, Control, DataModel, Map, Synapse, Topic, ChatView, Visualize}) => {
+const toExport = {
   subscribeToMap: id => {
-    let self = Cable
-    self.sub = self.cable.subscriptions.create({
+    let self = toExport
+    self.sub = Cable.cable.subscriptions.create({
       channel: 'MapChannel',
       id: id
     }, {
@@ -27,7 +16,7 @@ const Cable = {
     })
   },
   unsubscribeFromMap: () => {
-    let self = Cable
+    let self = toExport
     self.sub.unsubscribe()
     delete self.sub
   },
@@ -229,6 +218,11 @@ const Cable = {
       }
     })
   }
+}
+return toExport
+}
+Cable.init = () => {
+  Cable.cable = ActionCable.createConsumer()
 }
 
 export default Cable

@@ -2,14 +2,11 @@
 
 import _ from 'lodash'
 
-import Active from './Active'
-import Control from './Control'
-import DataModel from './DataModel'
 import GlobalUI, { ReactApp } from './GlobalUI'
 import Settings from './Settings'
-import Visualize from './Visualize'
 
-const Filter = {
+const Filter = ({Active, Control, DataModel, Visualize}) => {
+const toExport = {
   dataForPresentation: {
     metacodes: {},
     mappers: {},
@@ -26,7 +23,7 @@ const Filter = {
     synapses: []
   },
   reset: function() {
-    var self = Filter
+    var self = toExport
     self.filters.metacodes = []
     self.filters.mappers = []
     self.filters.synapses = []
@@ -41,7 +38,7 @@ const Filter = {
   // an abstraction function for checkMetacodes, checkMappers, checkSynapses to reduce
   // code redundancy
   updateFilters: function(collection, propertyToCheck, correlatedModel, filtersToUse, listToModify) {
-    var self = Filter
+    var self = toExport
     var newList = []
     var removed = []
     var added = []
@@ -97,11 +94,11 @@ const Filter = {
     ReactApp.render()
   },
   checkMetacodes: function() {
-    var self = Filter
+    var self = toExport
     self.updateFilters('Topics', 'metacode_id', 'Metacodes', 'metacodes', 'metacode')
   },
   checkMappers: function() {
-    var self = Filter
+    var self = toExport
     if (Active.Map) {
       self.updateFilters('Mappings', 'user_id', 'Mappers', 'mappers', 'mapper')
     } else {
@@ -110,23 +107,23 @@ const Filter = {
     }
   },
   checkSynapses: function() {
-    var self = Filter
+    var self = toExport
     self.updateFilters('Synapses', 'desc', 'Synapses', 'synapses', 'synapse')
   },
   filterAllMetacodes: function(toVisible) {
-    var self = Filter
+    var self = toExport
     self.visible.metacodes = toVisible ? self.filters.metacodes.slice() : []
     ReactApp.render()
     self.passFilters()
   },
   filterAllMappers: function(toVisible) {
-    var self = Filter
+    var self = toExport
     self.visible.mappers = toVisible ? self.filters.mappers.slice() : []
     ReactApp.render()
     self.passFilters()
   },
   filterAllSynapses: function(toVisible) {
-    var self = Filter
+    var self = toExport
     self.visible.synapses = toVisible ? self.filters.synapses.slice() : []
     ReactApp.render()
     self.passFilters()
@@ -135,7 +132,7 @@ const Filter = {
   // to reduce code redundancy
   // gets called in the context of a list item in a filter box
   toggleLi: function(whichToFilter, id) {
-    var self = Filter
+    var self = toExport
     if (self.visible[whichToFilter].indexOf(id) === -1) {
       self.visible[whichToFilter].push(id)
     } else {
@@ -146,19 +143,19 @@ const Filter = {
     self.passFilters()
   },
   toggleMetacode: function(id) {
-    var self = Filter
+    var self = toExport
     self.toggleLi('metacodes', id)
   },
   toggleMapper: function(id) {
-    var self = Filter
+    var self = toExport
     self.toggleLi('mappers', id)
   },
   toggleSynapse: function(id) {
-    var self = Filter
+    var self = toExport
     self.toggleLi('synapses', id)
   },
   passFilters: function() {
-    var self = Filter
+    var self = toExport
     var visible = self.visible
 
     var passesMetacode, passesMapper, passesSynapse
@@ -275,6 +272,8 @@ const Filter = {
       duration: 200
     })
   }
+}
+return toExport
 }
 
 export default Filter

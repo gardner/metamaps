@@ -3,18 +3,17 @@
 import Backbone from 'backbone'
 import { Howl } from 'howler'
 
-import Active from '../Active'
-import DataModel from '../DataModel'
 import ReactApp from '../GlobalUI/ReactApp'
 
-const ChatView = {
+const ChatView = ({Active, DataModel}) => {
+const toExport =  {
   isOpen: false,
   unreadMessages: 0,
   messages: new Backbone.Collection(),
   conversationLive: false,
   isParticipating: false,
   init: function(urls) {
-    const self = ChatView
+    const self = toExport
     self.sound = new Howl({
       src: urls,
       sprite: {
@@ -27,7 +26,7 @@ const ChatView = {
     })
   },
   setNewMap: function() {
-    const self = ChatView
+    const self = toExport
     self.unreadMessages = 0
     self.isOpen = false
     self.conversationLive = false
@@ -41,74 +40,74 @@ const ChatView = {
   },
   render: () => {
     if (!Active.Map) return
-    const self = ChatView
+    const self = toExport
     ReactApp.render()
   },
   onOpen: () => {
-    const self = ChatView
+    const self = toExport
     self.isOpen = true
     self.unreadMessages = 0
     self.render()
     $(document).trigger(ChatView.events.openTray)
   },
   onClose: () => {
-    const self = ChatView
+    const self = toExport
     self.isOpen = false
     $(document).trigger(ChatView.events.closeTray)
   },
   addParticipant: participant => {
-    ChatView.participants.add(participant)
-    ChatView.render()
+    toExport.participants.add(participant)
+    toExport.render()
   },
   removeParticipant: participant => {
-    ChatView.participants.remove(participant)
-    ChatView.render()
+    toExport.participants.remove(participant)
+    toExport.render()
   },
   leaveConversation: () => {
-    ChatView.isParticipating = false
-    ChatView.render()
+    toExport.isParticipating = false
+    toExport.render()
   },
   mapperJoinedCall: id => {
-    const mapper = ChatView.participants.findWhere({id})
+    const mapper = toExport.participants.findWhere({id})
     mapper && mapper.set('isParticipating', true)
-    ChatView.render()
+    toExport.render()
   },
   mapperLeftCall: id => {
-    const mapper = ChatView.participants.findWhere({id})
+    const mapper = toExport.participants.findWhere({id})
     mapper && mapper.set('isParticipating', false)
-    ChatView.render()
+    toExport.render()
   },
   invitationPending: id => {
-    const mapper = ChatView.participants.findWhere({id})
+    const mapper = toExport.participants.findWhere({id})
     mapper && mapper.set('isPending', true)
-    ChatView.render()
+    toExport.render()
   },
   invitationAnswered: id => {
-    const mapper = ChatView.participants.findWhere({id})
+    const mapper = toExport.participants.findWhere({id})
     mapper && mapper.set('isPending', false)
-    ChatView.render()
+    toExport.render()
   },
   conversationInProgress: participating => {
-    ChatView.conversationLive = true
-    ChatView.isParticipating = participating
-    ChatView.render()
+    toExport.conversationLive = true
+    toExport.isParticipating = participating
+    toExport.render()
   },
   conversationEnded: () => {
-    ChatView.conversationLive = false
-    ChatView.isParticipating = false
-    ChatView.participants.forEach(p => p.set({isParticipating: false, isPending: false}))
-    ChatView.render()
+    toExport.conversationLive = false
+    toExport.isParticipating = false
+    toExport.participants.forEach(p => p.set({isParticipating: false, isPending: false}))
+    toExport.render()
   },
   videoToggleClick: function() {
-    ChatView.videosShowing = !ChatView.videosShowing
-    $(document).trigger(ChatView.videosShowing ? ChatView.events.videosOn : ChatView.events.videosOff)
+    toExport.videosShowing = !toExport.videosShowing
+    $(document).trigger(toExport.videosShowing ? ChatView.events.videosOn : ChatView.events.videosOff)
   },
   cursorToggleClick: function() {
-    ChatView.cursorsShowing = !ChatView.cursorsShowing
-    $(document).trigger(ChatView.cursorsShowing ? ChatView.events.cursorsOn : ChatView.events.cursorsOff)
+    toExport.cursorsShowing = !toExport.cursorsShowing
+    $(document).trigger(toExport.cursorsShowing ? ChatView.events.cursorsOn : ChatView.events.cursorsOff)
   },
   soundToggleClick: function() {
-    ChatView.alertSound = !ChatView.alertSound
+    toExport.alertSound = !toExport.alertSound
   },
   inputFocus: () => {
     $(document).trigger(ChatView.events.inputFocus)
@@ -117,15 +116,15 @@ const ChatView = {
     $(document).trigger(ChatView.events.inputBlur)
   },
   addMessage: (message, isInitial, wasMe) => {
-    const self = ChatView
+    const self = toExport
     if (!isInitial && !self.isOpen) self.unreadMessages += 1
     if (!wasMe && !isInitial && self.alertSound) self.sound.play('receivechat')
     self.messages.add(message)
     if (!isInitial && self.isOpen) self.render()
   },
   sendChatMessage: message => {
-    var self = ChatView
-    if (ChatView.alertSound) ChatView.sound.play('sendchat')
+    var self = toExport
+    if (toExport.alertSound) toExport.sound.play('sendchat')
     var m = new DataModel.Message({
       message: message.message,
       resource_id: Active.Map.id,
@@ -141,13 +140,15 @@ const ChatView = {
     })
   },
   handleInputMessage: text => {
-    ChatView.sendChatMessage({message: text})
+    toExport.sendChatMessage({message: text})
   },
   // they should be instantiated as backbone models before they get
   // passed to this function
   addMessages: (messages, isInitial, wasMe) => {
-    messages.models.forEach(m => ChatView.addMessage(m, isInitial, wasMe))
+    messages.models.forEach(m => toExport.addMessage(m, isInitial, wasMe))
   }
+}
+return toExport
 }
 
 /**

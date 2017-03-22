@@ -3,15 +3,10 @@
 import parse from 'csv-parse'
 import _ from 'lodash'
 
-import Active from './Active'
-import AutoLayout from './AutoLayout'
-import DataModel from './DataModel'
 import GlobalUI from './GlobalUI'
-import Map from './Map'
-import Synapse from './Synapse'
-import Topic from './Topic'
 
-const Import = {
+const Import = ({Active, AutoLayout, DataModel, Map, Synapse, Topic}) => {
+const toExport = {
   // note that user is not imported
   topicWhitelist: [
     'id', 'name', 'metacode', 'x', 'y', 'description', 'link', 'permission'
@@ -22,12 +17,12 @@ const Import = {
   cidMappings: {}, // to be filled by importId => cid mappings
 
   handleTSV: function(text) {
-    const results = Import.parseTabbedString(text)
-    Import.handle(results)
+    const results = toExport.parseTabbedString(text)
+    toExport.handle(results)
   },
 
   handleCSV: function(text, parserOpts = {}) {
-    const self = Import
+    const self = toExport
 
     const topicsRegex = /("?Topics"?[, \t"]*)([\s\S]*)/mi
     const synapsesRegex = /("?Synapses"?[, \t"]*)([\s\S]*)/mi
@@ -68,11 +63,11 @@ const Import = {
 
   handleJSON: function(text) {
     const results = JSON.parse(text)
-    Import.handle(results)
+    toExport.handle(results)
   },
 
   handle: function(results) {
-    var self = Import
+    var self = toExport
     var topics = results.topics.map(topic => self.normalizeKeys(topic))
     var synapses = results.synapses.map(synapse => self.normalizeKeys(synapse))
 
@@ -87,7 +82,7 @@ const Import = {
   },
 
   parseTabbedString: function(text) {
-    var self = Import
+    var self = toExport
 
     // determine line ending and split lines
     var delim = '\n'
@@ -213,7 +208,7 @@ const Import = {
   },
 
   importTopics: function(parsedTopics) {
-    var self = Import
+    var self = toExport
 
     parsedTopics.forEach(topic => {
       let coords = { x: topic.x, y: topic.y }
@@ -240,7 +235,7 @@ const Import = {
   },
 
   importSynapses: function(parsedSynapses) {
-    var self = Import
+    var self = toExport
 
     parsedSynapses.forEach(function(synapse) {
       // only createSynapseWithParameters once both topics are persisted
@@ -279,7 +274,7 @@ const Import = {
 
   createTopicWithParameters: function(name, metacodeName, permission, desc,
     link, xloc, yloc, importId, opts = {}) {
-    var self = Import
+    var self = toExport
     $(document).trigger(Map.events.editedByActiveMapper)
     var metacode = DataModel.Metacodes.where({name: metacodeName})[0] || null
     if (metacode === null) {
@@ -359,7 +354,7 @@ const Import = {
     const permission = opts.permission || null // use default
     const desc = opts.desc || url
 
-    Import.createTopicWithParameters(
+    toExport.createTopicWithParameters(
       name,
       metacode,
       permission,
@@ -422,6 +417,8 @@ const Import = {
       result[newKey] = val
     })
   }
+}
+return toExport
 }
 
 export default Import

@@ -1,15 +1,18 @@
 import { ReactApp } from '../GlobalUI'
 
-const TopicCard = {
+const TopicCard = () => {
+const toExport = {
   openTopic: null,
   showCard: function(node) {
-    TopicCard.openTopic = node.getData('topic')
+    toExport.openTopic = node.getData('topic')
     ReactApp.render()
   },
   hideCard: function() {
-    TopicCard.openTopic = null
+    toExport.openTopic = null
     ReactApp.render()
   }
+}
+return toExport
 }
 
 export default TopicCard

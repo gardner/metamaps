@@ -1,16 +1,15 @@
 /* global $ */
 
-import Import from './Import'
 import Util from './Util'
-import Visualize from './Visualize'
 
-const PasteInput = {
+const PasteInput = ({Import, Visualize}) => {
+const toReturn = {
   // thanks to https://github.com/kevva/url-regex
   // eslint-disable-next-line no-useless-escape
   URL_REGEX: new RegExp('^(?:(?:(?:[a-z]+:)?//)|www\.)(?:\S+(?::\S*)?@)?(?:localhost|(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])(?:\.(?:25[0-5]|2[0-4][0-9]|1[0-9][0-9]|[1-9][0-9]|[0-9])){3}|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,}))\.?)(?::\d{2,5})?(?:[/?#][^\s"]*)?$'),
 
   init: function() {
-    var self = PasteInput
+    var self = toReturn
 
     // intercept dragged files
     // see http://stackoverflow.com/questions/6756583
@@ -50,7 +49,7 @@ const PasteInput = {
   },
 
   handleFile: (file, coords = null) => {
-    var self = PasteInput
+    var self = toReturn
     var fileReader = new window.FileReader()
     fileReader.readAsText(file)
     fileReader.onload = function(e) {
@@ -64,7 +63,7 @@ const PasteInput = {
   },
 
   handle: function(text, coords = {}) {
-    var self = PasteInput
+    var self = toReturn
 
     if (text.match(self.URL_REGEX)) {
       Import.handleURL(text, coords)
@@ -77,6 +76,8 @@ const PasteInput = {
       Import.handleCSV(text)
     }
   }
+}
+return toReturn
 }
 
 export default PasteInput

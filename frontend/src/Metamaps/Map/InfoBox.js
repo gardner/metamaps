@@ -3,12 +3,11 @@
 import outdent from 'outdent'
 import { browserHistory } from 'react-router'
 
-import Active from '../Active'
-import DataModel from '../DataModel'
 import GlobalUI, { ReactApp } from '../GlobalUI'
 import Util from '../Util'
 
-const InfoBox = {
+const InfoBox = ({Active, DataModel}) => {
+const toExport = {
   isOpen: false,
   selectingPermission: false,
   changePermissionText: "<div class='tooltips'>As the creator, you can change the permission of this map, and the permission of all the topics and synapses you have authority to change will change as well.</div>",
@@ -36,32 +35,32 @@ const InfoBox = {
   userImageUrl: '',
   html: '',
   init: function(serverData, updateThumbnail) {
-    var self = InfoBox
+    var self = toExport
 
     self.updateThumbnail = updateThumbnail
 
-    $('.mapInfoBox').click(function(event) {
+    $('.maptoExport').click(function(event) {
       event.stopPropagation()
     })
     $('body').click(self.close)
 
     self.attachEventListeners()
 
-    self.generateBoxHTML = Hogan.compile($('#mapInfoBoxTemplate').html())
+    self.generateBoxHTML = Hogan.compile($('#maptoExportTemplate').html())
 
     self.userImageUrl = serverData['user.png']
 
     var querystring = window.location.search.replace(/^\?/, '')
     if (querystring === 'new') {
       self.open()
-      $('.mapInfoBox').addClass('mapRequestTitle')
+      $('.maptoExport').addClass('mapRequestTitle')
       $('#mapInfoName').trigger('click')
       $('#mapInfoName textarea').focus()
       $('#mapInfoName textarea').select()
     }
   },
   toggleBox: function(event) {
-    var self = InfoBox
+    var self = toExport
 
     if (self.isOpen) self.close()
     else self.open()
@@ -69,23 +68,23 @@ const InfoBox = {
     event.stopPropagation()
   },
   open: function() {
-    var self = InfoBox
+    var self = toExport
     $('.mapInfoIcon div').addClass('hide')
-    $('.mapInfoBox').fadeIn(200, function() {
+    $('.maptoExport').fadeIn(200, function() {
       self.isOpen = true
     })
   },
   close: function() {
-    var self = InfoBox
+    var self = toExport
     $('.mapInfoIcon div').removeClass('hide')
-    $('.mapInfoBox').fadeOut(200, function() {
+    $('.maptoExport').fadeOut(200, function() {
       self.isOpen = false
       self.hidePermissionSelect()
       $('.mapContributors .tip').hide()
     })
   },
   load: function() {
-    var self = InfoBox
+    var self = toExport
 
     var map = Active.Map
 
@@ -115,12 +114,12 @@ const InfoBox = {
     self.attachEventListeners()
   },
   attachEventListeners: function() {
-    var self = InfoBox
+    var self = toExport
 
-    $('.mapInfoBox.canEdit .best_in_place').best_in_place()
+    $('.maptoExport.canEdit .best_in_place').best_in_place()
 
     // because anyone who can edit the map can change the map title
-    var bipName = $('.mapInfoBox .best_in_place_name')
+    var bipName = $('.maptoExport .best_in_place_name')
     bipName.unbind('best_in_place:activate').bind('best_in_place:activate', function() {
       var $el = bipName.find('textarea')
       var el = $el[0]
@@ -144,7 +143,7 @@ const InfoBox = {
       Active.Map.trigger('saved')
       // mobile menu
       $('#header_content').html(name)
-      $('.mapInfoBox').removeClass('mapRequestTitle')
+      $('.maptoExport').removeClass('mapRequestTitle')
       document.title = `${name} | Metamaps`
       window.history.replaceState('', `${name} | Metamaps`, window.location.pathname)
     })
@@ -164,8 +163,8 @@ const InfoBox = {
 
     $('.yourMap .mapPermission').unbind().click(self.onPermissionClick)
     // .yourMap in the unbind/bind is just a namespace for the events
-    // not a reference to the class .yourMap on the .mapInfoBox
-    $('.mapInfoBox.yourMap').unbind('.yourMap').bind('click.yourMap', self.hidePermissionSelect)
+    // not a reference to the class .yourMap on the .maptoExport
+    $('.maptoExport.yourMap').unbind('.yourMap').bind('click.yourMap', self.hidePermissionSelect)
 
     $('.yourMap .mapInfoDelete').unbind().click(self.deleteActiveMap)
     $('.mapInfoThumbnail').unbind().click(self.updateThumbnail)
@@ -178,14 +177,14 @@ const InfoBox = {
       event.stopPropagation()
     })
 
-    $('.mapInfoBox').unbind('.hideTip').bind('click.hideTip', function() {
+    $('.maptoExport').unbind('.hideTip').bind('click.hideTip', function() {
       $('.mapContributors .tip').hide()
     })
 
     self.addTypeahead()
   },
   addTypeahead: function() {
-    var self = InfoBox
+    var self = toExport
 
     if (!Active.Map) return
 
@@ -232,14 +231,14 @@ const InfoBox = {
     }
   },
   removeCollaborator: function(collaboratorId) {
-    var self = InfoBox
+    var self = toExport
     DataModel.Collaborators.remove(DataModel.Collaborators.get(collaboratorId))
     var mapperIds = DataModel.Collaborators.models.map(function(mapper) { return mapper.id })
     $.post('/maps/' + Active.Map.id + '/access', { access: mapperIds })
     self.updateNumbers()
   },
   addCollaborator: function(newCollaboratorId) {
-    var self = InfoBox
+    var self = toExport
 
     if (DataModel.Collaborators.get(newCollaboratorId)) {
       GlobalUI.notifyUser('That user already has access')
@@ -258,16 +257,16 @@ const InfoBox = {
     $.getJSON('/users/' + newCollaboratorId + '.json', callback)
   },
   handleResultClick: function(event, item) {
-    var self = InfoBox
+    var self = toExport
 
     self.addCollaborator(item.id)
     $('.collaboratorSearchField').typeahead('val', '')
   },
   updateNameDescPerm: function(name, desc, perm) {
-    $('.mapInfoBox').removeClass('mapRequestTitle')
+    $('.maptoExport').removeClass('mapRequestTitle')
     $('.mapInfoName .best_in_place_name').html(name)
     $('.mapInfoDesc .best_in_place_desc').html(desc)
-    $('.mapInfoBox .mapPermission').removeClass('commons public private').addClass(perm)
+    $('.maptoExport .mapPermission').removeClass('commons public private').addClass(perm)
   },
   createContributorList: function() {
     var relevantPeople = Active.Map.get('permission') === 'commons' ? DataModel.Mappers : DataModel.Collaborators
@@ -294,7 +293,7 @@ const InfoBox = {
   updateNumbers: function() {
     if (!Active.Map) return
 
-    const self = InfoBox
+    const self = toExport
 
     var relevantPeople = Active.Map.get('permission') === 'commons' ? DataModel.Mappers : DataModel.Collaborators
 
@@ -323,7 +322,7 @@ const InfoBox = {
     $('.mapEditedAt').html('<span>Last edited: </span>' + Util.nowDateFormatted())
   },
   onPermissionClick: function(event) {
-    var self = InfoBox
+    var self = toExport
 
     if (!self.selectingPermission) {
       self.selectingPermission = true
@@ -340,14 +339,14 @@ const InfoBox = {
     }
   },
   hidePermissionSelect: function() {
-    var self = InfoBox
+    var self = toExport
 
     self.selectingPermission = false
     $('.mapPermission').removeClass('minimize') // this line flips the pull up arrow to a drop down arrow
     $('.mapPermission .permissionSelect').remove()
   },
   selectPermission: function(event) {
-    var self = InfoBox
+    var self = toExport
 
     self.selectingPermission = false
     var permission = $(this).attr('class')
@@ -358,7 +357,7 @@ const InfoBox = {
     const shareable = permission === 'private' ? '' : 'shareable'
     $('.mapPermission').removeClass('commons public private minimize').addClass(permission)
     $('.mapPermission .permissionSelect').remove()
-    $('.mapInfoBox').removeClass('shareable').addClass(shareable)
+    $('.maptoExport').removeClass('shareable').addClass(shareable)
     event.stopPropagation()
   },
   deleteActiveMap: function() {
@@ -371,7 +370,7 @@ const InfoBox = {
     var authorized = map.authorizePermissionChange(mapper)
 
     if (doIt && authorized) {
-      InfoBox.close()
+      toExport.close()
       DataModel.Maps.Active.remove(map)
       DataModel.Maps.Featured.remove(map)
       DataModel.Maps.Mine.remove(map)
@@ -383,6 +382,8 @@ const InfoBox = {
       window.alert("Hey now. We can't just go around willy nilly deleting other people's maps now can we? Run off and find something constructive to do, eh?")
     }
   }
+}
+return toExport
 }
 
 export default InfoBox

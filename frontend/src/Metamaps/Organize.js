@@ -2,10 +2,8 @@ import _ from 'lodash'
 
 import $jit from '../patched/JIT'
 
-import Visualize from './Visualize'
-import JIT from './JIT'
-
-const Organize = {
+const Organize = ({Visualize, JIT}) => {
+const toExport = {
   arrange: function(layout, centerNode) {
     // first option for layout to implement is 'grid', will do an evenly spaced grid with its center at the 0,0 origin
     if (layout === 'grid') {
@@ -111,6 +109,8 @@ const Organize = {
       window.alert('please call function with a valid layout dammit!')
     }
   }
+}
+return toExport
 }
 
 export default Organize

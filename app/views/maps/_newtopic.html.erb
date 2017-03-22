@@ -22,11 +22,16 @@
   <div class="clearfloat"></div>
 
   <script>
+    Metamaps.ServerData = Metamaps.ServerData || {}
+    Metamaps.ServerData.selectedMetacodes = []
+    Metamaps.ServerData.newSelectedMetacodes = []
+    Metamaps.ServerData.selectedMetacodeNames = []
+    Metamaps.ServerData.newSelectedMetacodeNames = []
     <% @metacodes.each do |metacode| %>
-      Metamaps.Create.selectedMetacodes.push("<%= metacode.id %>");
-      Metamaps.Create.newSelectedMetacodes.push("<%= metacode.id %>");
-      Metamaps.Create.selectedMetacodeNames.push("<%= metacode.name %>");
-      Metamaps.Create.newSelectedMetacodeNames.push("<%= metacode.name %>");
+      Metamaps.ServerData.selectedMetacodes.push("<%= metacode.id %>");
+      Metamaps.ServerData.newSelectedMetacodes.push("<%= metacode.id %>");
+      Metamaps.ServerData.selectedMetacodeNames.push("<%= metacode.name %>");
+      Metamaps.ServerData.newSelectedMetacodeNames.push("<%= metacode.name %>");
     <% end %> 
   </script>
 <% end %>

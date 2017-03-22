@@ -7,13 +7,12 @@ import { merge } from 'lodash'
 
 import { notifyUser } from './index.js'
 import ImportDialog from './ImportDialog'
-import Active from '../Active'
-import DataModel from '../DataModel'
+import Mapper from '../DataModel/Mapper'
 import { ExploreMaps, ChatView, TopicCard } from '../Views'
 import Filter from '../Filter'
 import JIT from '../JIT'
 import Realtime from '../Realtime'
-import Map, { InfoBox } from '../Map'
+import Map, { mapControl } from '../Map'
 import Topic from '../Topic'
 import Visualize from '../Visualize'
 import makeRoutes from '../../components/makeRoutes'
@@ -27,8 +26,11 @@ const MAX_COLUMNS = 4
 
 const ReactApp = {
   serverData: {},
+  currentUser: null,
   mapId: null,
+  openMap: null,
   topicId: null,
+  openTopic: null,
   unreadNotificationsCount: 0,
   mapsWidth: 0,
   toast: '',
@@ -36,9 +38,11 @@ const ReactApp = {
   mobileTitle: '',
   mobileTitleWidth: 0,
   metacodeSets: [],
+  juntoState: { connectedPeople: {}, liveMaps: {} },
   init: function(serverData, openLightbox) {
     const self = ReactApp
     self.serverData = serverData
+    self.currentUser = new Mapper(serverData.ActiveMapper)
     self.unreadNotificationsCount = serverData.unreadNotificationsCount
     self.mobileTitle = serverData.mobileTitle
     self.openLightbox = openLightbox
@@ -52,12 +56,13 @@ const ReactApp = {
     const pathname = this.state.location.pathname
     switch (pathname.split('/')[1]) {
       case '':
-        if (Active.Mapper && Active.Mapper.id) {
+        if (self.currentUser && self.currentUser.id) {
           $('#yield').hide()
           ExploreMaps.updateFromPath(pathname)
           self.mapId = null
-          Active.Map = null
-          Active.Topic = null
+          self.topicId = null
+          self.openMap = null
+          self.openTopic = null
         }
         break
       case 'explore':
@@ -65,19 +70,19 @@ const ReactApp = {
         ExploreMaps.updateFromPath(pathname)
         self.mapId = null
         self.topicId = null
-        Active.Map = null
-        Active.Topic = null
+        self.openMap = null
+        self.openTopic = null
         break
       case 'topics':
         $('#yield').hide()
-        Active.Map = null
+        self.openMap = null
         self.mapId = null
         self.topicId = pathname.split('/')[2]
         break
       case 'maps':
         if (!pathname.includes('request_access')) {
           $('#yield').hide()
-          Active.Topic = null
+          self.openTopic = null
           self.topicId = null
           self.mapId = pathname.split('/')[2]
         }
@@ -99,14 +104,18 @@ const ReactApp = {
     const self = ReactApp
     return merge({
       unreadNotificationsCount: self.unreadNotificationsCount,
-      currentUser: Active.Mapper,
+      currentUser: self.currentUser,
       toast: self.toast,
       mobile: self.mobile,
       mobileTitle: self.mobileTitle,
       mobileTitleWidth: self.mobileTitleWidth,
-      mobileTitleClick: (e) => Active.Map && InfoBox.toggleBox(e),
+      mobileTitleClick: (e) => self.openMap && self.openMap.InfoBox.toggleBox(e),
       openInviteLightbox: () => self.openLightbox('invite'),
-      serverData: self.serverData
+      serverData: self.serverData,
+      endActiveMap: mapControl.end,
+      launchNewMap: mapControl.launch,
+      mapId: self.mapId,
+      topicId: self.topicId
     },
     self.getMapProps(),
     self.getTopicProps(),
@@ -118,27 +127,27 @@ const ReactApp = {
   },
   getMapProps: function() {
     const self = ReactApp
+    if (!self.openMap) return {}
     return {
-      mapId: self.mapId,
-      map: Active.Map,
-      hasLearnedTopicCreation: Map.hasLearnedTopicCreation,
-      userRequested: Map.userRequested,
-      requestAnswered: Map.requestAnswered,
-      requestApproved: Map.requestApproved,
-      onRequestAccess: Map.requestAccess,
-      mapIsStarred: Map.mapIsStarred,
-      endActiveMap: Map.end,
-      launchNewMap: Map.launch,
-      toggleMapInfoBox: InfoBox.toggleBox,
-      infoBoxHtml: InfoBox.html,
+      map: self.openMap.Active.Map,
+      hasLearnedTopicCreation: self.openMap.Map.hasLearnedTopicCreation,
+      userRequested: self.openMap.Map.userRequested,
+      requestAnswered: self.openMap.Map.requestAnswered,
+      requestApproved: self.openMap.Map.requestApproved,
+      onRequestAccess: self.openMap.Map.requestAccess,
+      mapIsStarred: self.openMap.Map.mapIsStarred,
+      toggleMapInfoBox: self.openMap.InfoBox.toggleBox,
+      infoBoxHtml: self.openMap.InfoBox.html,
       openImportLightbox: () => ImportDialog.show(),
-      forkMap: Map.fork,
-      onMapStar: Map.star,
-      onMapUnstar: Map.unstar
+      forkMap: self.openMap.Map.fork,
+      onMapStar: self.openMap.Map.star,
+      onMapUnstar: self.openMap.Map.unstar
     }
   },
   getCommonProps: function() {
     const self = ReactApp
+    if (!(self.openMap || self.openTopic)) return {}
+    const { JIT, Visualize } = self.openMap || self.openTopic
     return {
       openHelpLightbox: () => self.openLightbox('cheatsheet'),
       onZoomExtents: event => JIT.zoomExtents(event, Visualize.mGraph.canvas),
@@ -148,20 +157,22 @@ const ReactApp = {
   },
   getTopicCardProps: function() {
     const self = ReactApp
+    if (!(self.openMap || self.openTopic)) return {}
+    const { TopicCard } = self.openMap || self.openTopic
     return {
       openTopic: TopicCard.openTopic,
       metacodeSets: self.metacodeSets,
       updateTopic: (topic, obj) => topic.save(obj),
-      onTopicFollow: Topic.onTopicFollow
+      onTopicFollow: Topic.onTopicFollow // todo
     }
   },
   getTopicProps: function() {
     const self = ReactApp
+    if (!self.openTopic) return {}
     return {
-      topicId: self.topicId,
-      topic: Active.Topic,
-      endActiveTopic: Topic.end,
-      launchNewTopic: Topic.launch
+      topic: self.openTopic.Active.Topic,
+      endActiveTopic: Topic.end, // todo
+      launchNewTopic: Topic.launch // todo
     }
   },
   getMapsProps: function() {
@@ -169,7 +180,7 @@ const ReactApp = {
     return {
       section: ExploreMaps.collection && ExploreMaps.collection.id,
       maps: ExploreMaps.collection,
-      juntoState: Realtime.juntoState,
+      juntoState: self.juntoState,
       moreToLoad: ExploreMaps.collection && ExploreMaps.collection.page !== 'loadedAll',
       user: ExploreMaps.collection && ExploreMaps.collection.id === 'mapper' ? ExploreMaps.mapper : null,
       loadMore: ExploreMaps.loadMore,
@@ -182,6 +193,11 @@ const ReactApp = {
   },
   getChatProps: function() {
     const self = ReactApp
+    if (!self.openMap) return {
+      participants: [],
+      messages: []
+    }
+    const { ChatView, Realtime } = self.openMap 
     return {
       unreadMessages: ChatView.unreadMessages,
       conversationLive: ChatView.conversationLive,
@@ -204,6 +220,8 @@ const ReactApp = {
   },
   getFilterProps: function() {
     const self = ReactApp
+    if (!self.openMap) return {}
+    const { Filter } = self.openMap 
     return {
       filterData: Filter.dataForPresentation,
       allForFiltering: Filter.filters,
@@ -219,7 +237,7 @@ const ReactApp = {
   resize: function() {
     const self = ReactApp
     const maps = ExploreMaps.collection
-    const currentUser = Active.Mapper
+    const currentUser = self.currentUser
     const user = maps && maps.id === 'mapper' ? ExploreMaps.mapper : null
     const numCards = (maps ? maps.length : 0) + (user || currentUser ? 1 : 0)
     const mapSpaces = Math.floor(document.body.clientWidth / MAP_WIDTH)

@@ -5,9 +5,9 @@ import { Search } from './GlobalUI'
 
 const Listeners = ({ Active, Create, Control, DataModel, JIT, Realtime, Selected, Topic, Visualize }) => {
 return {
-  init: function() {
+  activate: function() {
     var self = this
-    $(document).on('keydown', function(e) {
+    $(document).on('keydown.map', function(e) {
       if (!(Active.Map || Active.Topic)) return
 
       const onCanvas = e.target.tagName === 'BODY'
@@ -131,7 +131,7 @@ return {
           break
       }
     })
-    $(window).resize(function() {
+    $(window).on('resize.map', function() {
       if (Visualize && Visualize.mGraph) {
         Util.resizeCanvas(Visualize.mGraph.canvas)
       }

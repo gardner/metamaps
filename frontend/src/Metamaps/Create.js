@@ -1,15 +1,9 @@
 /* global $, Hogan, Bloodhound */
 
-import DataModel from './DataModel'
-import Map from './Map'
-import Mouse from './Mouse'
-import Selected from './Selected'
-import Synapse from './Synapse'
-import Topic from './Topic'
-import Visualize from './Visualize'
 import GlobalUI from './GlobalUI'
 
-const Create = {
+const toExport = ({DataModel, Map, Mouse, Selected, Synapse, Topic, Visualize}) => {
+const toExport = {
   isSwitchingSet: false, // indicates whether the metacode set switch lightbox is open
   selectedMetacodeSet: null,
   selectedMetacodeSetIndex: null,
@@ -17,52 +11,54 @@ const Create = {
   newSelectedMetacodeNames: [],
   selectedMetacodes: [],
   newSelectedMetacodes: [],
-  init: function() {
-    var self = Create
-    self.newTopic.init()
-    self.newSynapse.init()
-
+  init: function(serverData) {
+    toExport.newTopic.init()
+    toExport.newSynapse.init()
+    toExport.selectedMetacodeSet = serverData.selectedMetacodeSet
+    toExport.selectedMetacodeSetIndex = serverData.selectedMetacodeSetIndex
+    toExport.selectedMetacodes = serverData.selectedMetacodes
+    toExport.newSelectedMetacodes = serverData.newSelectedMetacodes
+    toExport.selectedMetacodeNames = serverData.newSelectedMetacodeNames
+    toExport.newSelectedMetacodeNames = serverData.newSelectedMetacodeNames
     // // SWITCHING METACODE SETS
-
     $('#metacodeSwitchTabs').tabs({
-      active: self.selectedMetacodeSetIndex
+      active: toExport.selectedMetacodeSetIndex
     }).addClass('ui-tabs-vertical ui-helper-clearfix')
     $('#metacodeSwitchTabs .ui-tabs-nav li').removeClass('ui-corner-top').addClass('ui-corner-left')
-    $('.customMetacodeList li').click(self.toggleMetacodeSelected) // within the custom metacode set tab
-    $('.selectAll').click(self.metacodeSelectorSelectAll)
-    $('.selectNone').click(self.metacodeSelectorSelectNone)
+    $('.customMetacodeList li').click(toExport.toggleMetacodeSelected) // within the custom metacode set tab
+    $('.selectAll').click(toExport.metacodeSelectorSelectAll)
+    $('.selectNone').click(toExport.metacodeSelectorSelectNone)
   },
   toggleMetacodeSelected: function() {
-    var self = Create
 
     if ($(this).attr('class') !== 'toggledOff') {
       $(this).addClass('toggledOff')
       var valueToRemove = $(this).attr('id')
       var nameToRemove = $(this).attr('data-name')
-      self.newSelectedMetacodes.splice(self.newSelectedMetacodes.indexOf(valueToRemove), 1)
-      self.newSelectedMetacodeNames.splice(self.newSelectedMetacodeNames.indexOf(nameToRemove), 1)
+      toExport.newSelectedMetacodes.splice(self.newSelectedMetacodes.indexOf(valueToRemove), 1)
+      toExport.newSelectedMetacodeNames.splice(self.newSelectedMetacodeNames.indexOf(nameToRemove), 1)
     } else if ($(this).attr('class') === 'toggledOff') {
       $(this).removeClass('toggledOff')
-      self.newSelectedMetacodes.push($(this).attr('id'))
-      self.newSelectedMetacodeNames.push($(this).attr('data-name'))
+      toExport.newSelectedMetacodes.push($(this).attr('id'))
+      toExport.newSelectedMetacodeNames.push($(this).attr('data-name'))
     }
-    self.updateSelectAllColors()
+    toExport.updateSelectAllColors()
   },
   updateSelectAllColors: function() {
     $('.selectAll, .selectNone').removeClass('selected')
-    if (Create.metacodeSelectorAreAllSelected()) {
+    if (toExport.metacodeSelectorAreAllSelected()) {
       $('.selectAll').addClass('selected')
-    } else if (Create.metacodeSelectorAreNoneSelected()) {
+    } else if (toExport.metacodeSelectorAreNoneSelected()) {
       $('.selectNone').addClass('selected')
     }
   },
   metacodeSelectorSelectAll: function() {
-    $('.customMetacodeList li.toggledOff').each(Create.toggleMetacodeSelected)
-    Create.updateSelectAllColors()
+    $('.customMetacodeList li.toggledOff').each(toExport.toggleMetacodeSelected)
+    toExport.updateSelectAllColors()
   },
   metacodeSelectorSelectNone: function() {
-    $('.customMetacodeList li').not('.toggledOff').each(Create.toggleMetacodeSelected)
-    Create.updateSelectAllColors()
+    $('.customMetacodeList li').not('.toggledOff').each(toExport.toggleMetacodeSelected)
+    toExport.updateSelectAllColors()
   },
   metacodeSelectorAreAllSelected: function() {
     return $('.customMetacodeList li').toArray()
@@ -75,41 +71,41 @@ const Create = {
              .reduce((curr, prev) => curr && prev)
   },
   metacodeSelectorToggleSelectAll: function() {
-    // should be called when Create.isSwitchingSet is true and .customMetacodeList is visible
-    if (!Create.isSwitchingSet) return
+    // should be called when toExport.isSwitchingSet is true and .customMetacodeList is visible
+    if (!toExport.isSwitchingSet) return
     if (!$('.customMetacodeList').is(':visible')) return
 
     // If all are selected, then select none. Otherwise, select all.
-    if (Create.metacodeSelectorAreAllSelected()) {
-      Create.metacodeSelectorSelectNone()
+    if (toExport.metacodeSelectorAreAllSelected()) {
+      toExport.metacodeSelectorSelectNone()
     } else {
       // if some, but not all, are selected, it still runs this function
-      Create.metacodeSelectorSelectAll()
+      toExport.metacodeSelectorSelectAll()
     }
   },
   updateMetacodeSet: function(set, index, custom) {
-    if (custom && Create.newSelectedMetacodes.length === 0) {
+    if (custom && toExport.newSelectedMetacodes.length === 0) {
       window.alert('Please select at least one metacode to use!')
       return false
     }
 
     var codesToSwitchToIds
     var metacodeModels = new DataModel.MetacodeCollection()
-    Create.selectedMetacodeSetIndex = index
-    Create.selectedMetacodeSet = 'metacodeset-' + set
+    toExport.selectedMetacodeSetIndex = index
+    toExport.selectedMetacodeSet = 'metacodeset-' + set
 
     if (!custom) {
       codesToSwitchToIds = $('#metacodeSwitchTabs' + set).attr('data-metacodes').split(',')
       $('.customMetacodeList li').addClass('toggledOff')
-      Create.selectedMetacodes = []
-      Create.selectedMetacodeNames = []
-      Create.newSelectedMetacodes = []
-      Create.newSelectedMetacodeNames = []
+      toExport.selectedMetacodes = []
+      toExport.selectedMetacodeNames = []
+      toExport.newSelectedMetacodes = []
+      toExport.newSelectedMetacodeNames = []
     } else if (custom) {
       // uses .slice to avoid setting the two arrays to the same actual array
-      Create.selectedMetacodes = Create.newSelectedMetacodes.slice(0)
-      Create.selectedMetacodeNames = Create.newSelectedMetacodeNames.slice(0)
-      codesToSwitchToIds = Create.selectedMetacodes.slice(0)
+      toExport.selectedMetacodes = Create.newSelectedMetacodes.slice(0)
+      toExport.selectedMetacodeNames = Create.newSelectedMetacodeNames.slice(0)
+      codesToSwitchToIds = toExport.selectedMetacodes.slice(0)
     }
 
     // sort by name
@@ -141,7 +137,7 @@ const Create = {
 
     var mdata = {
       'metacodes': {
-        'value': custom ? Create.selectedMetacodes.toString() : Create.selectedMetacodeSet
+        'value': custom ? toExport.selectedMetacodes.toString() : Create.selectedMetacodeSet
       }
     }
     $.ajax({
@@ -158,26 +154,25 @@ const Create = {
     })
   },
   cancelMetacodeSetSwitch: function() {
-    var self = Create
-    self.isSwitchingSet = false
+    toExport.isSwitchingSet = false
 
-    if (self.selectedMetacodeSet !== 'metacodeset-custom') {
+    if (toExport.selectedMetacodeSet !== 'metacodeset-custom') {
       $('.customMetacodeList li').addClass('toggledOff')
-      self.selectedMetacodes = []
-      self.selectedMetacodeNames = []
-      self.newSelectedMetacodes = []
-      self.newSelectedMetacodeNames = []
+      toExport.selectedMetacodes = []
+      toExport.selectedMetacodeNames = []
+      toExport.newSelectedMetacodes = []
+      toExport.newSelectedMetacodeNames = []
     } else { // custom set is selected
       // reset it to the current actual selection
       $('.customMetacodeList li').addClass('toggledOff')
-      for (var i = 0; i < self.selectedMetacodes.length; i++) {
-        $('#' + self.selectedMetacodes[i]).removeClass('toggledOff')
+      for (var i = 0; i < toExport.selectedMetacodes.length; i++) {
+        $('#' + toExport.selectedMetacodes[i]).removeClass('toggledOff')
       }
       // uses .slice to avoid setting the two arrays to the same actual array
-      self.newSelectedMetacodeNames = self.selectedMetacodeNames.slice(0)
-      self.newSelectedMetacodes = self.selectedMetacodes.slice(0)
+      toExport.newSelectedMetacodeNames = self.selectedMetacodeNames.slice(0)
+      toExport.newSelectedMetacodes = self.selectedMetacodes.slice(0)
     }
-    $('#metacodeSwitchTabs').tabs('option', 'active', self.selectedMetacodeSetIndex)
+    $('#metacodeSwitchTabs').tabs('option', 'active', toExport.selectedMetacodeSetIndex)
     $('#topic_name').focus()
   },
   newTopic: {
@@ -186,19 +181,19 @@ const Create = {
         const ESC = 27
 
         if (e.keyCode === ESC) {
-          Create.newTopic.hide()
+          toExport.newTopic.hide()
         } // if
 
-        Create.newTopic.name = $(this).val()
+        toExport.newTopic.name = $(this).val()
       })
 
       $('.pinCarousel').click(function() {
-        if (Create.newTopic.pinned) {
+        if (toExport.newTopic.pinned) {
           $('.pinCarousel').removeClass('isPinned')
-          Create.newTopic.pinned = false
+          toExport.newTopic.pinned = false
         } else {
           $('.pinCarousel').addClass('isPinned')
-          Create.newTopic.pinned = true
+          toExport.newTopic.pinned = true
         }
       })
 
@@ -232,7 +227,7 @@ const Create = {
 
       // tell the autocomplete to submit the form with the topic you clicked on if you pick from the autocomplete
       $('#topic_name').bind('typeahead:select', function(event, datum, dataset) {
-        Create.newTopic.beingCreated = false
+        toExport.newTopic.beingCreated = false
         if (datum.rtype === 'topic') {
           Topic.getTopicFromAutocomplete(datum.id)
         } else if (datum.rtype === 'map') {
@@ -259,7 +254,7 @@ const Create = {
     },
     name: null,
     newId: 1,
-    beingCreated: false,
+    beingtoExportd: false,
     metacode: null,
     x: null,
     y: null,
@@ -269,22 +264,22 @@ const Create = {
       $('#new_topic').fadeIn('fast', function() {
         $('#topic_name').focus()
       })
-      Create.newTopic.beingCreated = true
-      Create.newTopic.name = ''
-      Map.setHasLearnedTopicCreation(true)
+      toExport.newTopic.beingCreated = true
+      toExport.newTopic.name = ''
+      //Map.setHasLearnedTopicCreation(true)
     },
     hide: function(force) {
-      if (force || !Create.newTopic.pinned) {
+      if (force || !toExport.newTopic.pinned) {
         $('#new_topic').fadeOut('fast')
       }
       if (force) {
         $('.pinCarousel').removeClass('isPinned')
-        Create.newTopic.pinned = false
+        toExport.newTopic.pinned = false
       }
       if (DataModel.Topics.length === 0) {
         Map.setHasLearnedTopicCreation(false)
       }
-      Create.newTopic.beingCreated = false
+      toExport.newTopic.beingCreated = false
     },
     reset: function() {
       $('#topic_name').typeahead('val', '')
@@ -306,9 +301,8 @@ const Create = {
         remote: {
           url: '/search/synapses?topic1id=%TOPIC1&topic2id=%TOPIC2',
           prepare: function(query, settings) {
-            var self = Create.newSynapse
-            if (Selected.Nodes.length < 2 && self.topic1id && self.topic2id) {
-              settings.url = settings.url.replace('%TOPIC1', self.topic1id).replace('%TOPIC2', self.topic2id)
+            if (Selected.Nodes.length < 2 && toExport.newSynapse.topic1id && self.newSynapse.topic2id) {
+              settings.url = settings.url.replace('%TOPIC1', toExport.newSynapse.topic1id).replace('%TOPIC2', toExport.newSynapse.topic2id)
               return settings
             } else {
               return null
@@ -351,21 +345,21 @@ const Create = {
         const ESC = 27
 
         if (e.keyCode === ESC) {
-          Create.newSynapse.hide()
+          toExport.newSynapse.hide()
         } // if
 
-        Create.newSynapse.description = $(this).val()
+        toExport.newSynapse.description = $(this).val()
       })
 
       $('#synapse_desc').focusout(function() {
-        if (Create.newSynapse.beingCreated) {
+        if (toExport.newSynapse.beingCreated) {
           Synapse.createSynapseLocally()
         }
       })
 
       $('#synapse_desc').keydown(function(e) {
         const TAB = 9
-        if (Create.newSynapse.beingCreated && e.keyCode === TAB) {
+        if (toExport.newSynapse.beingCreated && e.keyCode === TAB) {
           e.preventDefault()
           Synapse.createSynapseLocally()
         }
@@ -375,12 +369,12 @@ const Create = {
         if (datum.id) { // if they clicked on an existing synapse get it
           Synapse.getSynapseFromAutocomplete(datum.id)
         } else {
-          Create.newSynapse.description = datum.value
+          toExport.newSynapse.description = datum.value
           Synapse.createSynapseLocally()
         }
       })
     },
-    beingCreated: false,
+    beingtoExportd: false,
     description: null,
     topic1id: null,
     topic2id: null,
@@ -389,19 +383,21 @@ const Create = {
       $('#new_synapse').fadeIn(100, function() {
         $('#synapse_desc').focus()
       })
-      Create.newSynapse.beingCreated = true
+      toExport.newSynapse.beingCreated = true
     },
     hide: function() {
       $('#new_synapse').fadeOut('fast')
       $('#synapse_desc').typeahead('val', '')
-      Create.newSynapse.beingCreated = false
-      Create.newTopic.addSynapse = false
-      Create.newSynapse.topic1id = 0
-      Create.newSynapse.topic2id = 0
+      toExport.newSynapse.beingCreated = false
+      toExport.newTopic.addSynapse = false
+      toExport.newSynapse.topic1id = 0
+      toExport.newSynapse.topic2id = 0
       Mouse.synapseStartCoordinates = []
       if (Visualize.mGraph) Visualize.mGraph.plot()
     }
   }
 }
+return toExport
+}
 
-export default Create
+export default toExport

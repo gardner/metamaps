@@ -10,14 +10,15 @@ import JIT from './JIT'
 import Loading from './Loading'
 import TopicCard from './Views/TopicCard'
 
-const Visualize = {
+const Visualize = ({Active, DataModel, JIT, TopicCard}) => {
+const toExport = {
   mGraph: null, // a reference to the graph object.
   cameraPosition: null, // stores the camera position when using a 3D visualization
   type: 'ForceDirected', // the type of graph we're building, could be "RGraph", "ForceDirected", or "ForceDirected3D"
   loadLater: false, // indicates whether there is JSON that should be loaded right in the offset, or whether to wait till the first topic is created
   touchDragNode: null,
   init: function(serverData) {
-    var self = Visualize
+    var self = toExport
 
     if (serverData.VisualizeType) self.type = serverData.VisualizeType
 
@@ -45,7 +46,7 @@ const Visualize = {
     })
   },
   computePositions: function() {
-    const self = Visualize
+    const self = toExport
 
     if (self.type === 'RGraph') {
       let i
@@ -107,7 +108,7 @@ const Visualize = {
    *
    */
   render: function() {
-    const self = Visualize
+    const self = toExport
 
     if (self.type === 'RGraph') {
       // clear the previous canvas from #infovis
@@ -199,11 +200,14 @@ const Visualize = {
     hold()
   },
   clearVisualization: function() {
-    Visualize.mGraph.graph.empty()
-    Visualize.mGraph.plot()
+    const self = toExport
+    self.mGraph.graph.empty()
+    self.mGraph.plot()
     JIT.centerMap(Visualize.mGraph.canvas)
     $('#infovis').empty()
   }
+}
+return toExport
 }
 
 export default Visualize

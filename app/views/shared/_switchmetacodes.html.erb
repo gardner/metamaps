@@ -116,6 +116,7 @@
 <div class="clearfloat"></div>
 
 <script>
-  Metamaps.Create.selectedMetacodeSet = "metacodeset-<%= selectedSet %>"
-  Metamaps.Create.selectedMetacodeSetIndex = <%= index %>
+  Metamaps.ServerData = Metamaps.ServerData || {}
+  Metamaps.ServerData.selectedMetacodeSet = "metacodeset-<%= selectedSet %>"
+  Metamaps.ServerData.selectedMetacodeSetIndex = <%= index %>
 </script>

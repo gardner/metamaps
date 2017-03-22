@@ -3,13 +3,8 @@
 import SimpleWebRTC from 'simplewebrtc'
 import SocketIoConnection from 'simplewebrtc/socketioconnection'
 
-import Active from '../Active'
-import Cable from '../Cable'
-import DataModel from '../DataModel'
-import JIT from '../JIT'
 import Util from '../Util'
-import Views, { ChatView } from '../Views'
-import Visualize from '../Visualize'
+import Views from '../Views'
 
 import {
   JUNTO_UPDATED,
@@ -63,8 +58,8 @@ import {
   dragTopic
 } from './sendable'
 
-let Realtime = {
-  juntoState: { connectedPeople: {}, liveMaps: {} },
+const Realtime = ({Active, Cable, DataModel, JIT, Visualize}) => {
+const toExport = {
   videoId: 'video-wrapper',
   socket: null,
   webrtc: null,
@@ -78,7 +73,7 @@ let Realtime = {
   localVideo: null,
   'junto_spinner_darkgrey.gif': '',
   init: function(serverData) {
-    var self = Realtime
+    var self = toExport
 
     self.addJuntoListeners()
 
@@ -154,7 +149,7 @@ let Realtime = {
     } // if Active.Mapper
   },
   addJuntoListeners: function() {
-    var self = Realtime
+    var self = toExport
 
     $(document).on(ChatView.events.openTray, function() {
       $('.main').addClass('compressed')
@@ -180,7 +175,7 @@ let Realtime = {
     })
   },
   startActiveMap: function() {
-    var self = Realtime
+    var self = toExport
     if (Active.Map && Active.Mapper) {
       if (Active.Map.authorizeToEdit(Active.Mapper)) {
         self.turnOn()
@@ -192,7 +187,7 @@ let Realtime = {
     }
   },
   endActiveMap: function() {
-    var self = Realtime
+    var self = toExport
     $(document).off('.map')
     // leave the appropriate rooms to leave
     if (self.inConversation) self.leaveCall()
@@ -202,7 +197,7 @@ let Realtime = {
     Cable.unsubscribeFromMap()
   },
   turnOn: function(notify) {
-    var self = Realtime
+    var self = toExport
     $('.collabCompass').show()
     self.room.room = 'map-' + Active.Map.id
     self.activeMapper = {
@@ -219,13 +214,13 @@ let Realtime = {
     self.setupLocalEvents()
   },
   setupChat: function() {
-    const self = Realtime
+    const self = toExport
     ChatView.setNewMap()
     ChatView.addParticipant(self.activeMapper)
     ChatView.addMessages(new DataModel.MessageCollection(DataModel.Messages), true)
   },
   setupLocalEvents: function() {
-    var self = Realtime
+    var self = toExport
     // local event listeners that trigger events
     $(document).on(JIT.events.zoom + '.map', self.positionPeerIcons)
     $(document).on(JIT.events.pan + '.map', self.positionPeerIcons)
@@ -242,7 +237,7 @@ let Realtime = {
     })
   },
   countOthersInConversation: function() {
-    var self = Realtime
+    var self = toExport
     var count = 0
     for (var key in self.mappersOnMap) {
       if (self.mappersOnMap[key].inConversation) count++
@@ -250,7 +245,7 @@ let Realtime = {
     return count
   },
   handleVideoAdded: function(v, id) {
-    var self = Realtime
+    var self = toExport
     self.positionVideos()
     v.setParent($('#wrapper'))
     v.$container.find('.video-cutoff').css({
@@ -259,7 +254,7 @@ let Realtime = {
     $('#wrapper').append(v.$container)
   },
   positionVideos: function() {
-    var self = Realtime
+    var self = toExport
     var videoIds = Object.keys(self.room.videos)
     // var numOfVideos = videoIds.length
     // var numOfVideosToPosition = _.filter(videoIds, function(id) {
@@ -290,7 +285,7 @@ let Realtime = {
     }
 
     // do self first
-    var myVideo = Realtime.localVideo.view
+    var myVideo = toExport.localVideo.view
     if (!myVideo.manuallyPositioned) {
       myVideo.$container.css({
         top: yFormula() + 'px',
@@ -308,7 +303,7 @@ let Realtime = {
     })
   },
   callEnded: function() {
-    var self = Realtime
+    var self = toExport
 
     ChatView.conversationEnded()
     self.room.leaveVideoOnly()
@@ -336,13 +331,13 @@ let Realtime = {
     })
   },
   positionPeerIcons: function() {
-    var self = Realtime
+    var self = toExport
     for (var key in self.mappersOnMap) {
       self.positionPeerIcon(key)
     }
   },
   positionPeerIcon: function(id) {
-    var self = Realtime
+    var self = toExport
     var mapper = self.mappersOnMap[id]
 
     var origPixels = Util.coordsToPixels(Visualize.mGraph, mapper.coords)
@@ -371,7 +366,7 @@ let Realtime = {
     }
   },
   limitPixelsToScreen: function(pixels) {
-    var self = Realtime
+    var self = toExport
 
     var boundary = self.chatOpen ? '#wrapper' : document
     var xLimit, yLimit
@@ -405,25 +400,28 @@ const sendables = [
   ['dragTopic', dragTopic]
 ]
 sendables.forEach(sendable => {
-  Realtime[sendable[0]] = sendable[1](Realtime)
+  toExport[sendable[0]] = sendable[1](toExport)
 })
 
-const subscribeToEvents = (Realtime, socket) => {
-  socket.on(JUNTO_UPDATED, juntoUpdated(Realtime))
-  socket.on(INVITED_TO_CALL, invitedToCall(Realtime))
-  socket.on(INVITED_TO_JOIN, invitedToJoin(Realtime))
-  socket.on(CALL_ACCEPTED, callAccepted(Realtime))
-  socket.on(CALL_DENIED, callDenied(Realtime))
-  socket.on(INVITE_DENIED, inviteDenied(Realtime))
-  socket.on(CALL_IN_PROGRESS, callInProgress(Realtime))
-  socket.on(CALL_STARTED, callStarted(Realtime))
-  socket.on(MAPPER_LIST_UPDATED, mapperListUpdated(Realtime))
-  socket.on(MAPPER_JOINED_CALL, mapperJoinedCall(Realtime))
-  socket.on(MAPPER_LEFT_CALL, mapperLeftCall(Realtime))
-  socket.on(PEER_COORDS_UPDATED, peerCoordsUpdated(Realtime))
-  socket.on(NEW_MAPPER, newMapper(Realtime))
-  socket.on(LOST_MAPPER, lostMapper(Realtime))
-  socket.on(TOPIC_DRAGGED, topicDragged(Realtime))
+const subscribeToEvents = (toExport, socket) => {
+  socket.on(JUNTO_UPDATED, juntoUpdated(toExport))
+  socket.on(INVITED_TO_CALL, invitedToCall(toExport))
+  socket.on(INVITED_TO_JOIN, invitedToJoin(toExport))
+  socket.on(CALL_ACCEPTED, callAccepted(toExport))
+  socket.on(CALL_DENIED, callDenied(toExport))
+  socket.on(INVITE_DENIED, inviteDenied(toExport))
+  socket.on(CALL_IN_PROGRESS, callInProgress(toExport))
+  socket.on(CALL_STARTED, callStarted(toExport))
+  socket.on(MAPPER_LIST_UPDATED, mapperListUpdated(toExport))
+  socket.on(MAPPER_JOINED_CALL, mapperJoinedCall(toExport))
+  socket.on(MAPPER_LEFT_CALL, mapperLeftCall(toExport))
+  socket.on(PEER_COORDS_UPDATED, peerCoordsUpdated(toExport))
+  socket.on(NEW_MAPPER, newMapper(toExport))
+  socket.on(LOST_MAPPER, lostMapper(toExport))
+  socket.on(TOPIC_DRAGGED, topicDragged(toExport))
 }
+return toExport
+}
+
 
 export default Realtime

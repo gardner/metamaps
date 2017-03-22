@@ -36,17 +36,6 @@ return {
   },
   vizData: [], // contains the visualization-compatible graph
   /**
-   * This method will bind the event handlers it is interested and initialize the class.
-   */
-  init: function(serverData) {
-    const self = JIT
-    self.topicDescImage = new Image()
-    self.topicDescImage.src = serverData['topic_description_signifier.png']
-
-    self.topicLinkImage = new Image()
-    self.topicLinkImage.src = serverData['topic_link_signifier.png']
-  },
-  /**
    * convert our topic JSON into something JIT can use
    */
   convertModelsToJIT: function(topics, synapses) {
@@ -1967,6 +1956,13 @@ return {
     }
   }
 }
+}
+JIT.init = function(serverData) {
+  JIT.topicDescImage = new Image()
+  JIT.topicDescImage.src = serverData['topic_description_signifier.png']
+
+  JIT.topicLinkImage = new Image()
+  JIT.topicLinkImage.src = serverData['topic_link_signifier.png']
 }
 
 export default JIT

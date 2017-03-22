@@ -1,17 +1,11 @@
 /* global $ */
 
-import Active from './Active'
-import Control from './Control'
-import Create from './Create'
-import DataModel from './DataModel'
-import Map from './Map'
-import Selected from './Selected'
 import Settings from './Settings'
-import Visualize from './Visualize'
 
 const noOp = () => {}
 
-const Synapse = {
+const Synapse = ({Active, Control, Create, DataModel, Map, Selected, Visualize}) => {
+const toExport = {
   // this function is to retrieve a synapse JSON object from the database
   // @param id = the id of the synapse to retrieve
   get: function(id, callback = noOp) {
@@ -77,7 +71,7 @@ const Synapse = {
     }
   },
   createSynapseLocally: function() {
-    var self = Synapse
+    var self = toExport
     let topic1
     let topic2
     let node1
@@ -124,7 +118,7 @@ const Synapse = {
     Create.newSynapse.hide()
   },
   getSynapseFromAutocomplete: function(id) {
-    var self = Synapse
+    var self = toExport
 
     self.get(id, synapse => {
       const mapping = new DataModel.Mapping({
@@ -140,6 +134,8 @@ const Synapse = {
       self.renderSynapse(mapping, synapse, node1, node2, true)
     })
   }
+}
+return toExport
 }
 
 export default Synapse
