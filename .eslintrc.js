@@ -12,6 +12,9 @@ module.exports = {
     "es6": true,
     "node": true
   },
+  "settings": {
+    "ecmascript": 6
+  },
   "plugins": [
     "promise",
     "standard",

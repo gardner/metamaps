@@ -1,9 +1,8 @@
 /* global $ */
 
-import Active from '../Active'
-import DataModel from '../DataModel'
-import GlobalUI, { ReactApp } from '../GlobalUI'
-import Loading from '../Loading'
+import DataModel from './DataModel'
+import GlobalUI, { ReactApp } from './GlobalUI'
+import Loading from './Loading'
 
 const ExploreMaps = {
   pending: false,
@@ -124,7 +123,7 @@ const ExploreMaps = {
   onStar: function(map) {
     $.post('/maps/' + map.id + '/star')
     map.set('star_count', map.get('star_count') + 1)
-    if (DataModel.Stars) DataModel.Stars.push({ user_id: Active.Mapper.id, map_id: map.id })
+    if (DataModel.Stars) DataModel.Stars.push({ user_id: ReactApp.currentUser.id, map_id: map.id })
     DataModel.Maps.Starred.add(map)
     GlobalUI.notifyUser('Map is now starred')
     ReactApp.render()
@@ -136,16 +135,16 @@ const ExploreMaps = {
     GlobalUI.notifyUser('You will be notified by email if request accepted')
   },
   onMapFollow: function(map) {
-    const isFollowing = map.isFollowedBy(Active.Mapper)
+    const isFollowing = map.isFollowedBy(ReactApp.currentUser)
     $.post({
       url: `/maps/${map.id}/${isFollowing ? 'un' : ''}follow`
     })
     if (isFollowing) {
       GlobalUI.notifyUser('You are no longer following this map')
-      Active.Mapper.unfollowMap(map.id)
+      ReactApp.currentUser.unfollowMap(map.id)
     } else {
       GlobalUI.notifyUser('You are now following this map')
-      Active.Mapper.followMap(map.id)
+      ReactApp.currentUser.followMap(map.id)
     }
     ReactApp.render()
   }
