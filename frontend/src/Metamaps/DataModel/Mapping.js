@@ -2,10 +2,10 @@ import _ from 'lodash'
 import Backbone from 'backbone'
 try { Backbone.$ = window.$ } catch (err) {}
 
-import Active from '../Active'
+/*import Active from '../Active'
 import Map from '../Map'
 import Synapse from '../Synapse'
-import Topic from '../Topic'
+import Topic from '../Topic'*/
 
 const Mapping = Backbone.Model.extend({
   urlRoot: '/mappings',

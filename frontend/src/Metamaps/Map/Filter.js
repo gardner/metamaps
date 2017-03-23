@@ -2,10 +2,10 @@
 
 import _ from 'lodash'
 
-import GlobalUI, { ReactApp } from './GlobalUI'
-import Settings from './Settings'
+import GlobalUI, { ReactApp } from '../GlobalUI'
+import Settings from '../Settings'
 
-const Filter = ({Active, Control, DataModel, Visualize}) => {
+const Filter = (map) => {
 const toExport = {
   dataForPresentation: {
     metacodes: {},
@@ -99,7 +99,7 @@ const toExport = {
   },
   checkMappers: function() {
     var self = toExport
-    if (Active.Map) {
+    if (map.Active.Map) {
       self.updateFilters('Mappings', 'user_id', 'Mappers', 'mappers', 'mapper')
     } else {
       // on topic view
@@ -160,16 +160,16 @@ const toExport = {
 
     var passesMetacode, passesMapper, passesSynapse
 
-    var opacityForFilter = Active.Map ? 0 : 0.4
+    var opacityForFilter = map.Active.Map ? 0 : 0.4
 
-    DataModel.Topics.each(function(topic) {
+    map.DataModel.Topics.each(function(topic) {
       var n = topic.get('node')
       var metacodeId = topic.get('metacode_id').toString()
 
       if (visible.metacodes.indexOf(metacodeId) === -1) passesMetacode = false
       else passesMetacode = true
 
-      if (Active.Map) {
+      if (map.Active.Map) {
         // when on a map,
         // we filter by mapper according to the person who added the
         // topic or synapse to the map
@@ -193,10 +193,10 @@ const toExport = {
         }
       } else {
         if (n) {
-          Control.deselectNode(n, true)
+          map.Control.deselectNode(n, true)
           n.setData('alpha', opacityForFilter, 'end')
           n.eachAdjacency(function(e) {
-            Control.deselectEdge(e, true)
+            map.Control.deselectEdge(e, true)
           })
         } else {
           console.log(topic)
@@ -205,11 +205,11 @@ const toExport = {
     })
 
     // flag all the edges back to 'untouched'
-    DataModel.Synapses.each(function(synapse) {
+    map.DataModel.Synapses.each(function(synapse) {
       var e = synapse.get('edge')
       e.setData('touched', false)
     })
-    DataModel.Synapses.each(function(synapse) {
+    map.DataModel.Synapses.each(function(synapse) {
       var e = synapse.get('edge')
       var desc
       var userId = synapse.get('user_id').toString()
@@ -241,7 +241,7 @@ const toExport = {
           }
         }
 
-        if (Active.Map) {
+        if (map.Active.Map) {
           // when on a map,
           // we filter by mapper according to the person who added the
           // topic or synapse to the map
@@ -255,7 +255,7 @@ const toExport = {
           e.setData('alpha', 1, 'end')
           e.setData('color', color, 'end')
         } else {
-          Control.deselectEdge(e, true)
+          map.Control.deselectEdge(e, true)
           e.setData('alpha', opacityForFilter, 'end')
         }
 
@@ -266,7 +266,7 @@ const toExport = {
     })
 
     // run the animation
-    Visualize.mGraph.fx.animate({
+    map.Visualize.mGraph.fx.animate({
       modes: ['node-property:alpha',
         'edge-property:alpha'],
       duration: 200

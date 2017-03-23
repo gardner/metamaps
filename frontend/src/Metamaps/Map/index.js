@@ -4,37 +4,36 @@ import outdent from 'outdent'
 import { find as _find } from 'lodash'
 import { browserHistory } from 'react-router'
 
-import Active from '../Active'
-import AutoLayout from '../AutoLayout'
-import Cable from '../Cable'
-import Control from '../Control'
-import Create from '../Create'
+import Active from './Active'
+import AutoLayout from './AutoLayout'
+import Cable from './Cable'
+import CheatSheet from './CheatSheet'
+import Control from './Control'
+import Create from './Create'
 import DataModel from '../DataModel'
 import DataModelMap from '../DataModel/Map'
 import MapperCollection from '../DataModel/MapperCollection'
 import TopicCollection from '../DataModel/TopicCollection'
 import SynapseCollection from '../DataModel/SynapseCollection'
 import MappingCollection from '../DataModel/MappingCollection'
-import Filter from '../Filter'
+import Filter from './Filter'
 import GlobalUI, { ReactApp } from '../GlobalUI'
-import Import from '../Import'
+import Import from './Import'
 import InfoBox from './InfoBox'
-import JIT from '../JIT'
-import Listeners from '../Listeners'
+import JIT from './JIT'
+import Listeners from './Listeners'
 import Loading from '../Loading'
-import Mouse from '../Mouse'
-import Organize from '../Organize'
-import PasteInput from '../PasteInput'
-import Realtime from '../Realtime'
-import Selected from '../Selected'
-import Synapse from '../Synapse'
-import SynapseCard from '../SynapseCard'
-import Topic from '../Topic'
-import TopicCard from '../Views/TopicCard'
-import ChatView from '../Views/ChatView'
-import Visualize from '../Visualize'
-
-import CheatSheet from './CheatSheet'
+import Mouse from './Mouse'
+import Organize from './Organize'
+import PasteInput from './PasteInput'
+import Realtime from './Realtime'
+import Selected from './Selected'
+import Synapse from './Synapse'
+import SynapseCard from './SynapseCard'
+import Topic from './Topic'
+import TopicCard from './TopicCard'
+import ChatView from './ChatView'
+import Visualize from './Visualize'
 
 const mapControl = {
   launch: function(id, serverData) {
@@ -85,10 +84,11 @@ const mapControl = {
       newMap.Topic = Topic(newMap)
       newMap.TopicCard = TopicCard(newMap)
       newMap.Visualize = Visualize(newMap)
-      
+
       console.log(newMap)
 
       newMap.Active.Map = new DataModelMap(data.map)
+      newMap.Active.Mapper = ReactApp.currentUser
       newMap.DataModel.Mappers = new MapperCollection(data.mappers)
       newMap.DataModel.Collaborators = new MapperCollection(data.collaborators)
       newMap.DataModel.Topics = new TopicCollection(data.topics)
@@ -129,7 +129,7 @@ const mapControl = {
     $('.rightclickmenu').remove()
     map.AutoLayout.resetSpiral()
     map.TopicCard.hideCard()
-    map.SynapseCard.hideCard()
+    map.map.SynapseCard.hideCard()
     map.Create.newTopic.hide(true) // true means force (and override pinned)
     map.Create.newSynapse.hide()
     map.InfoBox.close()
@@ -140,7 +140,7 @@ const mapControl = {
 }
 export { mapControl }
 
-const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
+const Map = (map) => {
   const toExport = {
     mapIsStarred: false,
     requests: [],
@@ -171,12 +171,12 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
     requestAccess: function() {
       const self = toExport
       self.requests.push({
-        user_id: Active.Mapper.id,
+        user_id: map.Active.Mapper.id,
         answered: false,
         approved: false
       })
       self.setAccessRequest()
-      const mapId = Active.Map.id
+      const mapId = map.Active.Map.id
       $.post({
         url: `/maps/${mapId}/access_request`
       })
@@ -184,8 +184,8 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
     },
     setAccessRequest: function() {
       const self = toExport
-      if (Active.Mapper) {
-        const request = _find(self.requests, r => r.user_id === Active.Mapper.id)
+      if (map.Active.Mapper) {
+        const request = _find(self.requests, r => r.user_id === map.Active.Mapper.id)
         if (!request) {
           self.userRequested = false
           self.requestAnswered = false
@@ -207,10 +207,10 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
     star: function() {
       var self = toExport
 
-      if (!Active.Map) return
-      $.post('/maps/' + Active.Map.id + '/star')
-      DataModel.Stars.push({ user_id: Active.Mapper.id, map_id: Active.Map.id })
-      DataModel.Maps.Starred.add(Active.Map)
+      if (!map.Active.Map) return
+      $.post('/maps/' + map.Active.Map.id + '/star')
+      map.DataModel.Stars.push({ user_id: map.Active.Mapper.id, map_id: map.Active.Map.id })
+      DataModel.Maps.Starred.add(map.Active.Map)
       GlobalUI.notifyUser('Map is now starred')
       self.mapIsStarred = true
       ReactApp.render()
@@ -218,10 +218,10 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
     unstar: function() {
       var self = toExport
 
-      if (!Active.Map) return
-      $.post('/maps/' + Active.Map.id + '/unstar')
-      DataModel.Stars = DataModel.Stars.filter(function(s) { return s.user_id !== Active.Mapper.id })
-      DataModel.Maps.Starred.remove(Active.Map)
+      if (!map.Active.Map) return
+      $.post('/maps/' + map.Active.Map.id + '/unstar')
+      map.DataModel.Stars = map.DataModel.Stars.filter(function(s) { return s.user_id !== map.Active.Mapper.id })
+      DataModel.Maps.Starred.remove(map.Active.Map)
       self.mapIsStarred = false
       ReactApp.render()
     },
@@ -233,7 +233,7 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
       let nodesArray = []
       let synapsesArray = []
       // collect the unfiltered topics
-      Visualize.mGraph.graph.eachNode(function(n) {
+      map.Visualize.mGraph.graph.eachNode(function(n) {
         // if the opacity is less than 1 then it's filtered
         if (n.getData('alpha') === 1) {
           var id = n.getData('topic').id
@@ -250,10 +250,10 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
         }
       })
       // collect the unfiltered synapses
-      DataModel.Synapses.each(function(synapse) {
+      map.DataModel.Synapses.each(function(synapse) {
         var desc = synapse.get('desc')
 
-        var descNotFiltered = Filter.visible.synapses.indexOf(desc) > -1
+        var descNotFiltered = map.Filter.visible.synapses.indexOf(desc) > -1
         // make sure that both topics are being added, otherwise, it
         // doesn't make sense to add the synapse
         var topicsNotFiltered = nodesArray.indexOf(synapse.get('topic1_id')) > -1
@@ -270,16 +270,16 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
       GlobalUI.CreateMap.synapsesToMap = synapsesData
     },
     leavePrivateMap: function() {
-      var map = Active.Map
-      DataModel.Maps.Active.remove(map)
+      var map = map.Active.Map
+      DataModel.Maps.map.Active.remove(map)
       DataModel.Maps.Featured.remove(map)
       browserHistory.push('/')
       GlobalUI.notifyUser('Sorry! That map has been changed to Private.')
     },
     cantEditNow: function() {
-      Realtime.turnOff(true) // true is for 'silence'
+      map.Realtime.turnOff(true) // true is for 'silence'
       GlobalUI.notifyUser('Map was changed to Public. Editing is disabled.')
-      Active.Map.trigger('changeByOther')
+      map.Active.Map.trigger('changeByOther')
     },
     canEditNow: function() {
       var confirmString = "You've been granted permission to edit this map. "
@@ -290,13 +290,13 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
       }
     },
     editedByActiveMapper: function() {
-      if (Active.Mapper) {
-        DataModel.Mappers.add(Active.Mapper)
+      if (map.Active.Mapper) {
+        DataModel.Mappers.add(map.Active.Mapper)
       }
     },
     offerScreenshotDownload: () => {
       const canvas = toExport.getMapCanvasForScreenshots()
-      const filename = toExport.getMapScreenshotFilename(Active.Map)
+      const filename = toExport.getMapScreenshotFilename(map.Active.Map)
 
       var downloadMessage = outdent`
         Captured map screenshot!
@@ -310,7 +310,7 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
     },
     uploadMapScreenshot: () => {
       const canvas = toExport.getMapCanvasForScreenshots()
-      const filename = toExport.getMapScreenshotFilename(Active.Map)
+      const filename = toExport.getMapScreenshotFilename(map.Active.Map)
 
       canvas.canvas.toBlob(imageBlob => {
         const formData = new window.FormData()
@@ -318,7 +318,7 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
         $.ajax({
           type: 'PATCH',
           dataType: 'json',
-          url: `/maps/${Active.Map.id}`,
+          url: `/maps/${map.Active.Map.id}`,
           data: formData,
           processData: false,
           contentType: false,
@@ -376,14 +376,14 @@ const Map = ({Active, DataModel, JIT, Visualize, Realtime}) => {
       // center it
       canvas.getCtx().translate(1880 / 2, 1260 / 2)
 
-      var mGraph = Visualize.mGraph
+      var mGraph = map.Visualize.mGraph
 
       var id = mGraph.root
       var root = mGraph.graph.getNode(id)
       var T = !!root.visited
 
       // pass true to avoid basing it on a selection
-      JIT.zoomExtents(null, canvas, true)
+      map.JIT.zoomExtents(null, canvas, true)
 
       const c = canvas.canvas
       const ctx = canvas.getCtx()

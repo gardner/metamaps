@@ -6,7 +6,7 @@ import outdent from 'outdent'
 
 import ImportDialogBox from '../../components/MapView/ImportDialogBox'
 
-import PasteInput from '../PasteInput'
+import PasteInput from '../Map/PasteInput'
 import Map from '../Map'
 
 const ImportDialog = {

@@ -1,18 +1,18 @@
 import _ from 'lodash'
 
-import $jit from '../patched/JIT'
+import $jit from '../../patched/JIT'
 
-const Organize = ({Visualize, JIT}) => {
+const Organize = (map) => {
 const toExport = {
   arrange: function(layout, centerNode) {
     // first option for layout to implement is 'grid', will do an evenly spaced grid with its center at the 0,0 origin
     if (layout === 'grid') {
-      const numNodes = _.size(Visualize.mGraph.graph.nodes) // this will always be an integer, the # of nodes on your graph visualization
+      const numNodes = _.size(map.Visualize.mGraph.graph.nodes) // this will always be an integer, the # of nodes on your graph visualization
       const numColumns = Math.floor(Math.sqrt(numNodes)) // the number of columns to make an even grid
       const GRIDSPACE = 400
       let row = 0
       let column = 0
-      Visualize.mGraph.graph.eachNode(function(n) {
+      map.Visualize.mGraph.graph.eachNode(function(n) {
         if (column === numColumns) {
           column = 0
           row += 1
@@ -23,13 +23,13 @@ const toExport = {
         n.setPos(newPos, 'end')
         column += 1
       })
-      Visualize.mGraph.animate(JIT.ForceDirected.animateSavedLayout)
+      map.Visualize.mGraph.animate(map.JIT.ForceDirected.animateSavedLayout)
     } else if (layout === 'grid_full') {
       // this will always be an integer, the # of nodes on your graph visualization
-      const numNodes = _.size(Visualize.mGraph.graph.nodes)
+      const numNodes = _.size(map.Visualize.mGraph.graph.nodes)
       const numColumns = Math.floor(Math.sqrt(numNodes)) // the number of columns to make an even grid
-      const height = Visualize.mGraph.canvas.getSize(0).height
-      const width = Visualize.mGraph.canvas.getSize(0).width
+      const height = map.Visualize.mGraph.canvas.getSize(0).height
+      const width = map.Visualize.mGraph.canvas.getSize(0).width
       const totalArea = height * width
       const cellArea = totalArea / numNodes
       const ratio = height / width
@@ -41,7 +41,7 @@ const toExport = {
       const totalCells = row * column
 
       if (totalCells) {
-        Visualize.mGraph.graph.eachNode(function(n) {
+        map.Visualize.mGraph.graph.eachNode(function(n) {
           if (column === numColumns) {
             column = 0
             row += 1
@@ -53,7 +53,7 @@ const toExport = {
           column += 1
         })
       }
-      Visualize.mGraph.animate(JIT.ForceDirected.animateSavedLayout)
+      map.Visualize.mGraph.animate(map.JIT.ForceDirected.animateSavedLayout)
     } else if (layout === 'radial') {
       var centerX = centerNode.getPos().x
       var centerY = centerNode.getPos().y
@@ -85,14 +85,14 @@ const toExport = {
         })
       }
       radial(centerNode, 1, 0)
-      Visualize.mGraph.animate(JIT.ForceDirected.animateSavedLayout)
+      map.Visualize.mGraph.animate(map.JIT.ForceDirected.animateSavedLayout)
     } else if (layout === 'center_viewport') {
       let lowX = 0
       let lowY = 0
       let highX = 0
       let highY = 0
 
-      Visualize.mGraph.graph.eachNode(function(n) {
+      map.Visualize.mGraph.graph.eachNode(function(n) {
         if (n.id === 1) {
           lowX = n.getPos().x
           lowY = n.getPos().y

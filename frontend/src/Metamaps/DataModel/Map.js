@@ -4,8 +4,7 @@ import _ from 'lodash'
 import Backbone from 'backbone'
 try { Backbone.$ = window.$ } catch (err) {}
 
-import Active from '../Active'
-import InfoBox from '../Map/InfoBox'
+//import InfoBox from '../Map/InfoBox'
 import Mapper from '../Mapper'
 
 const Map = Backbone.Model.extend({

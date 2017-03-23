@@ -2,15 +2,11 @@
 
 import _ from 'lodash'
 
-import $jit from '../patched/JIT'
+import $jit from '../../patched/JIT'
 
-import Active from './Active'
-import DataModel from './DataModel'
-import JIT from './JIT'
-import Loading from './Loading'
-import TopicCard from './Views/TopicCard'
+import Loading from '../Loading'
 
-const Visualize = ({Active, DataModel, JIT, TopicCard}) => {
+const Visualize = (map) => {
 const toExport = {
   mGraph: null, // a reference to the graph object.
   cameraPosition: null, // stores the camera position when using a 3D visualization
@@ -35,14 +31,14 @@ const toExport = {
 
     // prevent touch events on the canvas from default behaviour
     $('#infovis-canvas').bind('touchmove', function(event) {
-      // JIT.touchPanZoomHandler(event)
+      // map.JIT.touchPanZoomHandler(event)
     })
 
     // prevent touch events on the canvas from default behaviour
     $('#infovis-canvas').bind('touchend touchcancel', function(event) {
-      if (!self.mGraph.events.touchMoved && !Visualize.touchDragNode) TopicCard.hideCurrentCard()
+      if (!self.mGraph.events.touchMoved && !map.Visualize.touchDragNode) map.TopicCard.hideCurrentCard()
       self.mGraph.events.touched = self.mGraph.events.touchMoved = false
-      Visualize.touchDragNode = false
+      map.Visualize.touchDragNode = false
     })
   },
   computePositions: function() {
@@ -53,7 +49,7 @@ const toExport = {
       let l
 
       self.mGraph.graph.eachNode(function(n) {
-        const topic = DataModel.Topics.get(n.id)
+        const topic = map.DataModel.Topics.get(n.id)
         topic.set({ node: n }, { silent: true })
         topic.updateNode()
 
@@ -63,7 +59,7 @@ const toExport = {
 
             l = edge.getData('synapseIDs').length
             for (i = 0; i < l; i++) {
-              const synapse = DataModel.Synapses.get(edge.getData('synapseIDs')[i])
+              const synapse = map.DataModel.Synapses.get(edge.getData('synapseIDs')[i])
               synapse.set({ edge: edge }, { silent: true })
               synapse.updateEdge()
             }
@@ -76,7 +72,7 @@ const toExport = {
       self.mGraph.compute('end')
     } else if (self.type === 'ForceDirected') {
       self.mGraph.graph.eachNode(function(n) {
-        const topic = DataModel.Topics.get(n.id)
+        const topic = map.DataModel.Topics.get(n.id)
         topic.set({ node: n }, { silent: true })
         topic.updateNode()
         const mapping = topic.getMapping()
@@ -87,7 +83,7 @@ const toExport = {
 
             const l = edge.getData('synapseIDs').length
             for (let i = 0; i < l; i++) {
-              const synapse = DataModel.Synapses.get(edge.getData('synapseIDs')[i])
+              const synapse = map.DataModel.Synapses.get(edge.getData('synapseIDs')[i])
               synapse.set({ edge: edge }, { silent: true })
               synapse.updateEdge()
             }
@@ -114,25 +110,25 @@ const toExport = {
       // clear the previous canvas from #infovis
       $('#infovis').empty()
 
-      const RGraphSettings = $.extend(true, {}, JIT.ForceDirected.graphSettings)
+      const RGraphSettings = $.extend(true, {}, map.JIT.ForceDirected.graphSettings)
 
-      $jit.RGraph.Plot.NodeTypes.implement(JIT.ForceDirected.nodeSettings)
-      $jit.RGraph.Plot.EdgeTypes.implement(JIT.ForceDirected.edgeSettings)
+      $jit.RGraph.Plot.NodeTypes.implement(map.JIT.ForceDirected.nodeSettings)
+      $jit.RGraph.Plot.EdgeTypes.implement(map.JIT.ForceDirected.edgeSettings)
 
       RGraphSettings.width = $(document).width()
       RGraphSettings.height = $(document).height()
-      RGraphSettings.background = JIT.RGraph.background
-      RGraphSettings.levelDistance = JIT.RGraph.levelDistance
+      RGraphSettings.background = map.JIT.RGraph.background
+      RGraphSettings.levelDistance = map.JIT.RGraph.levelDistance
 
       self.mGraph = new $jit.RGraph(RGraphSettings)
     } else if (self.type === 'ForceDirected') {
       // clear the previous canvas from #infovis
       $('#infovis').empty()
 
-      const FDSettings = $.extend(true, {}, JIT.ForceDirected.graphSettings)
+      const FDSettings = $.extend(true, {}, map.JIT.ForceDirected.graphSettings)
 
-      $jit.ForceDirected.Plot.NodeTypes.implement(JIT.ForceDirected.nodeSettings)
-      $jit.ForceDirected.Plot.EdgeTypes.implement(JIT.ForceDirected.edgeSettings)
+      $jit.ForceDirected.Plot.NodeTypes.implement(map.JIT.ForceDirected.nodeSettings)
+      $jit.ForceDirected.Plot.EdgeTypes.implement(map.JIT.ForceDirected.edgeSettings)
 
       FDSettings.width = $('body').width()
       FDSettings.height = $('body').height()
@@ -143,7 +139,7 @@ const toExport = {
       $('#infovis').empty()
 
       // init ForceDirected3D
-      self.mGraph = new $jit.ForceDirected3D(JIT.ForceDirected3D.graphSettings)
+      self.mGraph = new $jit.ForceDirected3D(map.JIT.ForceDirected3D.graphSettings)
       self.cameraPosition = self.mGraph.canvas.canvases[0].camera.position
     } else {
       self.mGraph.graph.empty()
@@ -155,22 +151,22 @@ const toExport = {
       if (!self.loadLater) {
         // load JSON data.
         var rootIndex = 0
-        if (Active.Topic) {
-          var node = _.find(JIT.vizData, function(node) {
-            return node.id === Active.Topic.id
+        if (map.Active.Topic) {
+          var node = _.find(map.JIT.vizData, function(node) {
+            return node.id === map.Active.Topic.id
           })
-          rootIndex = _.indexOf(JIT.vizData, node)
+          rootIndex = _.indexOf(map.JIT.vizData, node)
         }
-        self.mGraph.loadJSON(JIT.vizData, rootIndex)
+        self.mGraph.loadJSON(map.JIT.vizData, rootIndex)
         // compute positions and plot.
         self.computePositions()
         self.mGraph.busy = true
         if (self.type === 'RGraph') {
-          self.mGraph.fx.animate(JIT.RGraph.animate)
+          self.mGraph.fx.animate(map.JIT.RGraph.animate)
         } else if (self.type === 'ForceDirected') {
-          self.mGraph.animate(JIT.ForceDirected.animateSavedLayout)
+          self.mGraph.animate(map.JIT.ForceDirected.animateSavedLayout)
         } else if (self.type === 'ForceDirected3D') {
-          self.mGraph.animate(JIT.ForceDirected.animateFDLayout)
+          self.mGraph.animate(map.JIT.ForceDirected.animateFDLayout)
         }
       }
     }
@@ -178,7 +174,7 @@ const toExport = {
     // hold for a maximum of 80 passes, or 4 seconds of waiting time
     var tries = 0
     function hold() {
-      const unique = _.uniq(DataModel.Topics.models, function(metacode) { return metacode.get('metacode_id') })
+      const unique = _.uniq(map.DataModel.Topics.models, function(metacode) { return metacode.get('metacode_id') })
       const requiredMetacodes = _.map(unique, function(metacode) { return metacode.get('metacode_id') })
       let loadedCount = 0
 
@@ -203,7 +199,7 @@ const toExport = {
     const self = toExport
     self.mGraph.graph.empty()
     self.mGraph.plot()
-    JIT.centerMap(Visualize.mGraph.canvas)
+    map.JIT.centerMap(map.Visualize.mGraph.canvas)
     $('#infovis').empty()
   }
 }

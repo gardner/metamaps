@@ -2,10 +2,10 @@ import _ from 'lodash'
 import Backbone from 'backbone'
 try { Backbone.$ = window.$ } catch (err) {}
 
-import Active from '../Active'
-import Filter from '../Filter'
-import TopicCard from '../Views/TopicCard'
-import Visualize from '../Visualize'
+import Active from '../Map/Active'
+import Filter from '../Map/Filter'
+import TopicCard from '../Map/TopicCard'
+import Visualize from '../Map/Visualize'
 
 import DataModel from './index'
 

@@ -3,7 +3,7 @@
 import SimpleWebRTC from 'simplewebrtc'
 import SocketIoConnection from 'simplewebrtc/socketioconnection'
 
-import Util from '../Util'
+import Util from '../../Util'
 import Views from '../Views'
 
 import {
@@ -58,7 +58,7 @@ import {
   dragTopic
 } from './sendable'
 
-const Realtime = ({Active, Cable, DataModel, JIT, Visualize}) => {
+const Realtime = (map) => {
 const toExport = {
   videoId: 'video-wrapper',
   socket: null,
@@ -88,7 +88,7 @@ const toExport = {
 
     self.socket.on('connect', function() {
       console.log('connected')
-      if (Active.Map && Active.Mapper && Active.Map.authorizeToEdit(Active.Mapper)) {
+      if (map.Active.Map && map.Active.Mapper && map.Active.Map.authorizeToEdit(map.Active.Mapper)) {
         self.checkForCall()
         self.joinMap()
       }
@@ -99,7 +99,7 @@ const toExport = {
       self.disconnected = true
     })
 
-    if (Active.Mapper) {
+    if (map.Active.Mapper) {
       self.webrtc = new SimpleWebRTC({
         connection: self.socket,
         localVideoEl: self.videoId,
@@ -117,7 +117,7 @@ const toExport = {
           video: true,
           audio: true
         },
-        nick: Active.Mapper.id
+        nick: map.Active.Mapper.id
       })
       self.webrtc.webrtc.on('iceFailed', function(peer) {
         console.log('local ice failure', peer)
@@ -133,7 +133,7 @@ const toExport = {
         $video: $video,
         view: new Views.VideoView($video[0], $('body'), 'me', true, {
           DOUBLE_CLICK_TOLERANCE: 200,
-          avatar: Active.Mapper ? Active.Mapper.get('image') : ''
+          avatar: map.Active.Mapper ? map.Active.Mapper.get('image') : ''
         })
       }
 
@@ -146,7 +146,7 @@ const toExport = {
         config: { DOUBLE_CLICK_TOLERANCE: 200 }
       })
       self.room.videoAdded(self.handleVideoAdded)
-    } // if Active.Mapper
+    } // if map.Active.Mapper
   },
   addJuntoListeners: function() {
     var self = toExport
@@ -176,14 +176,14 @@ const toExport = {
   },
   startActiveMap: function() {
     var self = toExport
-    if (Active.Map && Active.Mapper) {
-      if (Active.Map.authorizeToEdit(Active.Mapper)) {
+    if (map.Active.Map && map.Active.Mapper) {
+      if (map.Active.Map.authorizeToEdit(map.Active.Mapper)) {
         self.turnOn()
         self.checkForCall()
         self.joinMap()
       }
       self.setupChat() // chat can happen on public maps too
-      Cable.subscribeToMap(Active.Map.id) // people with edit rights can still see live updates
+      map.Cable.subscribeToMap(map.Active.Map.id) // people with edit rights can still see live updates
     }
   },
   endActiveMap: function() {
@@ -194,17 +194,17 @@ const toExport = {
     self.leaveMap()
     $('.collabCompass').remove()
     if (self.room) self.room.leave()
-    Cable.unsubscribeFromMap()
+    map.Cable.unsubscribeFromMap()
   },
   turnOn: function(notify) {
     var self = toExport
     $('.collabCompass').show()
-    self.room.room = 'map-' + Active.Map.id
+    self.room.room = 'map-' + map.Active.Map.id
     self.activeMapper = {
-      id: Active.Mapper.id,
-      name: Active.Mapper.get('name'),
-      username: Active.Mapper.get('name'),
-      image: Active.Mapper.get('image'),
+      id: map.Active.Mapper.id,
+      name: map.Active.Mapper.get('name'),
+      username: map.Active.Mapper.get('name'),
+      image: map.Active.Mapper.get('image'),
       color: Util.getPastelColor(),
       self: true
     }
@@ -215,24 +215,24 @@ const toExport = {
   },
   setupChat: function() {
     const self = toExport
-    ChatView.setNewMap()
-    ChatView.addParticipant(self.activeMapper)
-    ChatView.addMessages(new DataModel.MessageCollection(DataModel.Messages), true)
+    map.ChatView.setNewMap()
+    map.ChatView.addParticipant(self.activeMapper)
+    map.ChatView.addMessages(new DataModel.MessageCollection(map.DataModel.Messages), true)
   },
   setupLocalEvents: function() {
     var self = toExport
     // local event listeners that trigger events
-    $(document).on(JIT.events.zoom + '.map', self.positionPeerIcons)
-    $(document).on(JIT.events.pan + '.map', self.positionPeerIcons)
+    $(document).on(map.JIT.events.zoom + '.map', self.positionPeerIcons)
+    $(document).on(map.JIT.events.pan + '.map', self.positionPeerIcons)
     $(document).on('mousemove.map', function(event) {
       var pixels = {
         x: event.pageX,
         y: event.pageY
       }
-      var coords = Util.pixelsToCoords(Visualize.mGraph, pixels)
+      var coords = Util.pixelsToCoords(map.Visualize.mGraph, pixels)
       self.sendCoords(coords)
     })
-    $(document).on(JIT.events.topicDrag + '.map', function(event, positions) {
+    $(document).on(map.JIT.events.topicDrag + '.map', function(event, positions) {
       self.dragTopic(positions)
     })
   },
@@ -305,7 +305,7 @@ const toExport = {
   callEnded: function() {
     var self = toExport
 
-    ChatView.conversationEnded()
+    map.ChatView.conversationEnded()
     self.room.leaveVideoOnly()
     self.inConversation = false
     self.localVideo.view.$container.hide().css({
@@ -340,7 +340,7 @@ const toExport = {
     var self = toExport
     var mapper = self.mappersOnMap[id]
 
-    var origPixels = Util.coordsToPixels(Visualize.mGraph, mapper.coords)
+    var origPixels = Util.coordsToPixels(map.Visualize.mGraph, mapper.coords)
     var pixels = self.limitPixelsToScreen(origPixels)
     $('#compass' + id).css({
       left: pixels.x + 'px',
@@ -400,25 +400,25 @@ const sendables = [
   ['dragTopic', dragTopic]
 ]
 sendables.forEach(sendable => {
-  toExport[sendable[0]] = sendable[1](toExport)
+  toExport[sendable[0]] = sendable[1](toExport, map)
 })
 
 const subscribeToEvents = (toExport, socket) => {
-  socket.on(JUNTO_UPDATED, juntoUpdated(toExport))
-  socket.on(INVITED_TO_CALL, invitedToCall(toExport))
-  socket.on(INVITED_TO_JOIN, invitedToJoin(toExport))
-  socket.on(CALL_ACCEPTED, callAccepted(toExport))
-  socket.on(CALL_DENIED, callDenied(toExport))
-  socket.on(INVITE_DENIED, inviteDenied(toExport))
-  socket.on(CALL_IN_PROGRESS, callInProgress(toExport))
-  socket.on(CALL_STARTED, callStarted(toExport))
-  socket.on(MAPPER_LIST_UPDATED, mapperListUpdated(toExport))
-  socket.on(MAPPER_JOINED_CALL, mapperJoinedCall(toExport))
-  socket.on(MAPPER_LEFT_CALL, mapperLeftCall(toExport))
-  socket.on(PEER_COORDS_UPDATED, peerCoordsUpdated(toExport))
-  socket.on(NEW_MAPPER, newMapper(toExport))
-  socket.on(LOST_MAPPER, lostMapper(toExport))
-  socket.on(TOPIC_DRAGGED, topicDragged(toExport))
+  socket.on(JUNTO_UPDATED, juntoUpdated(toExport, map))
+  socket.on(INVITED_TO_CALL, invitedToCall(toExport, map))
+  socket.on(INVITED_TO_JOIN, invitedToJoin(toExport, map))
+  socket.on(CALL_ACCEPTED, callAccepted(toExport, map))
+  socket.on(CALL_DENIED, callDenied(toExport, map))
+  socket.on(INVITE_DENIED, inviteDenied(toExport, map))
+  socket.on(CALL_IN_PROGRESS, callInProgress(toExport, map))
+  socket.on(CALL_STARTED, callStarted(toExport, map))
+  socket.on(MAPPER_LIST_UPDATED, mapperListUpdated(toExport, map))
+  socket.on(MAPPER_JOINED_CALL, mapperJoinedCall(toExport, map))
+  socket.on(MAPPER_LEFT_CALL, mapperLeftCall(toExport, map))
+  socket.on(PEER_COORDS_UPDATED, peerCoordsUpdated(toExport, map))
+  socket.on(NEW_MAPPER, newMapper(toExport, map))
+  socket.on(LOST_MAPPER, lostMapper(toExport, map))
+  socket.on(TOPIC_DRAGGED, topicDragged(toExport, map))
 }
 return toExport
 }

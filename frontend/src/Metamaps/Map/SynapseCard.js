@@ -1,7 +1,7 @@
 /* global $ */
-import Mapper from './Mapper'
+import Mapper from '../Mapper'
 
-const SynapseCard = ({Active, Control, Visualize}) => {
+const SynapseCard = (map) => {
 const toExport = {
   openSynapseCard: null,
   showCard: function(edge, e) {
@@ -13,7 +13,7 @@ const toExport = {
     $('#edit_synapse').remove()
 
     // so label is missing while editing
-    Control.deselectEdge(edge)
+    map.Control.deselectEdge(edge)
 
     var index = edge.getData('displayIndex') ? edge.getData('displayIndex') : 0
     var synapse = edge.getData('synapses')[index] // for now, just get the first synapse
@@ -23,9 +23,9 @@ const toExport = {
     var editDiv = document.createElement('div')
     editDiv.innerHTML = '<div id="editSynUpperBar"></div><div id="editSynLowerBar"></div>'
     editDiv.setAttribute('id', 'edit_synapse')
-    if (synapse.authorizeToEdit(Active.Mapper)) {
+    if (synapse.authorizeToEdit(map.Active.Mapper)) {
       editDiv.className = 'permission canEdit'
-      editDiv.className += synapse.authorizePermissionChange(Active.Mapper) ? ' yourEdge' : ''
+      editDiv.className += synapse.authorizePermissionChange(map.Active.Mapper) ? ' yourEdge' : ''
     } else {
       editDiv.className = 'permission cannotEdit'
     }
@@ -89,7 +89,7 @@ const toExport = {
 
     // if edge data is blank or just whitespace, populate it with dataNil
     if ($('#edit_synapse_desc').html().trim() === '') {
-      if (synapse.authorizeToEdit(Active.Mapper)) {
+      if (synapse.authorizeToEdit(map.Active.Mapper)) {
         $('#edit_synapse_desc').html(dataNil)
       } else {
         $('#edit_synapse_desc').html('(no description)')
@@ -110,8 +110,8 @@ const toExport = {
         synapse.set('desc', desc)
       }
       synapse.trigger('saved')
-      Control.selectEdge(synapse.get('edge'))
-      Visualize.mGraph.plot()
+      map.Control.selectEdge(synapse.get('edge'))
+      map.Visualize.mGraph.plot()
     })
   },
   add_drop_down: function(edge, synapse) {
@@ -153,7 +153,7 @@ const toExport = {
         e.stopPropagation()
         var index = parseInt($(this).attr('data-synapse-index'))
         edge.setData('displayIndex', index)
-        Visualize.mGraph.plot()
+        map.Visualize.mGraph.plot()
         toExport.showCard(edge, false)
       })
     }
@@ -211,7 +211,7 @@ const toExport = {
       $('#edit_synapse .permissionSelect').remove()
     }
 
-    if (synapse.authorizePermissionChange(Active.Mapper)) {
+    if (synapse.authorizePermissionChange(map.Active.Mapper)) {
       $('#edit_synapse.yourEdge .mapPerm').click(openPermissionSelect)
       $('#edit_synapse').click(hidePermissionSelect)
     }
@@ -260,7 +260,7 @@ const toExport = {
       $('#edit_synapse_right').addClass('checked')
     }
 
-    if (synapse.authorizeToEdit(Active.Mapper)) {
+    if (synapse.authorizeToEdit(map.Active.Mapper)) {
       $('#edit_synapse_left, #edit_synapse_right').click(function() {
         $(this).toggleClass('checked')
 
@@ -284,7 +284,7 @@ const toExport = {
           topic1_id: dir[0],
           topic2_id: dir[1]
         })
-        Visualize.mGraph.plot()
+        map.Visualize.mGraph.plot()
       })
     } // if
   } // add_direction_form

@@ -1,8 +1,8 @@
 /* global $, Hogan, Bloodhound */
 
-import GlobalUI from './GlobalUI'
+import GlobalUI from '../GlobalUI'
 
-const toExport = ({DataModel, Map, Mouse, Selected, Synapse, Topic, Visualize}) => {
+const toExport = (map) => {
 const toExport = {
   isSwitchingSet: false, // indicates whether the metacode set switch lightbox is open
   selectedMetacodeSet: null,
@@ -103,8 +103,8 @@ const toExport = {
       toExport.newSelectedMetacodeNames = []
     } else if (custom) {
       // uses .slice to avoid setting the two arrays to the same actual array
-      toExport.selectedMetacodes = Create.newSelectedMetacodes.slice(0)
-      toExport.selectedMetacodeNames = Create.newSelectedMetacodeNames.slice(0)
+      toExport.selectedMetacodes = map.Create.newSelectedMetacodes.slice(0)
+      toExport.selectedMetacodeNames = map.Create.newSelectedMetacodeNames.slice(0)
       codesToSwitchToIds = toExport.selectedMetacodes.slice(0)
     }
 
@@ -137,7 +137,7 @@ const toExport = {
 
     var mdata = {
       'metacodes': {
-        'value': custom ? toExport.selectedMetacodes.toString() : Create.selectedMetacodeSet
+        'value': custom ? toExport.selectedMetacodes.toString() : map.Create.selectedMetacodeSet
       }
     }
     $.ajax({
@@ -276,7 +276,7 @@ const toExport = {
         $('.pinCarousel').removeClass('isPinned')
         toExport.newTopic.pinned = false
       }
-      if (DataModel.Topics.length === 0) {
+      if (map.DataModel.Topics.length === 0) {
         Map.setHasLearnedTopicCreation(false)
       }
       toExport.newTopic.beingCreated = false
@@ -301,7 +301,7 @@ const toExport = {
         remote: {
           url: '/search/synapses?topic1id=%TOPIC1&topic2id=%TOPIC2',
           prepare: function(query, settings) {
-            if (Selected.Nodes.length < 2 && toExport.newSynapse.topic1id && self.newSynapse.topic2id) {
+            if (map.Selected.Nodes.length < 2 && toExport.newSynapse.topic1id && self.newSynapse.topic2id) {
               settings.url = settings.url.replace('%TOPIC1', toExport.newSynapse.topic1id).replace('%TOPIC2', toExport.newSynapse.topic2id)
               return settings
             } else {
@@ -353,7 +353,7 @@ const toExport = {
 
       $('#synapse_desc').focusout(function() {
         if (toExport.newSynapse.beingCreated) {
-          Synapse.createSynapseLocally()
+          map.Synapse.createSynapseLocally()
         }
       })
 
@@ -361,7 +361,7 @@ const toExport = {
         const TAB = 9
         if (toExport.newSynapse.beingCreated && e.keyCode === TAB) {
           e.preventDefault()
-          Synapse.createSynapseLocally()
+          map.Synapse.createSynapseLocally()
         }
       })
 
@@ -370,7 +370,7 @@ const toExport = {
           Synapse.getSynapseFromAutocomplete(datum.id)
         } else {
           toExport.newSynapse.description = datum.value
-          Synapse.createSynapseLocally()
+          map.Synapse.createSynapseLocally()
         }
       })
     },
@@ -392,8 +392,8 @@ const toExport = {
       toExport.newTopic.addSynapse = false
       toExport.newSynapse.topic1id = 0
       toExport.newSynapse.topic2id = 0
-      Mouse.synapseStartCoordinates = []
-      if (Visualize.mGraph) Visualize.mGraph.plot()
+      map.Mouse.synapseStartCoordinates = []
+      if (map.Visualize.mGraph) map.Visualize.mGraph.plot()
     }
   }
 }

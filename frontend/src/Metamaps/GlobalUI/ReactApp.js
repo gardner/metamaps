@@ -10,7 +10,7 @@ import ImportDialog from './ImportDialog'
 import Mapper from '../DataModel/Mapper'
 import ExploreMaps from '../ExploreMaps'
 import { mapControl } from '../Map'
-import { topicControl } from '../Topic'
+//import { topicControl } from '../Topic'
 import makeRoutes from '../../components/makeRoutes'
 let routes
 
@@ -193,7 +193,7 @@ const ReactApp = {
       participants: [],
       messages: []
     }
-    const { ChatView, Realtime } = self.openMap 
+    const { ChatView, Realtime } = self.openMap
     return {
       unreadMessages: ChatView.unreadMessages,
       conversationLive: ChatView.conversationLive,
@@ -217,7 +217,7 @@ const ReactApp = {
   getFilterProps: function() {
     const self = ReactApp
     if (!self.openMap) return {}
-    const { Filter } = self.openMap 
+    const { Filter } = self.openMap
     return {
       filterData: Filter.dataForPresentation,
       allForFiltering: Filter.filters,

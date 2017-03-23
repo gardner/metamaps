@@ -1,8 +1,6 @@
 /* global $ */
 
-import Active from '../Active'
-import { ChatView } from '../Views'
-import GlobalUI from '../GlobalUI'
+import GlobalUI from '../../GlobalUI'
 
 import {
   JOIN_MAP,
@@ -20,38 +18,38 @@ import {
   DRAG_TOPIC
 } from './events'
 
-export const joinMap = self => () => {
+export const joinMap = (self, map) => () => {
   self.socket.emit(JOIN_MAP, {
-    userid: Active.Mapper.id,
-    username: Active.Mapper.get('name'),
-    avatar: Active.Mapper.get('image'),
-    mapid: Active.Map.id,
-    map: Active.Map.attributes
+    userid: map.Active.Mapper.id,
+    username: map.Active.Mapper.get('name'),
+    avatar: map.Active.Mapper.get('image'),
+    mapid: map.Active.Map.id,
+    map: map.Active.Map.attributes
   })
 }
 
-export const leaveMap = self => () => {
+export const leaveMap = (self, map) => () => {
   self.socket.emit(LEAVE_MAP)
 }
 
-export const checkForCall = self => () => {
-  self.socket.emit(CHECK_FOR_CALL, { room: self.room.room, mapid: Active.Map.id })
+export const checkForCall = (self, map) => () => {
+  self.socket.emit(CHECK_FOR_CALL, { room: self.room.room, mapid: map.Active.Map.id })
 }
 
-export const sendMapperInfo = self => userid => {
+export const sendMapperInfo = (self, map) => userid => {
   // send this new mapper back your details, and the awareness that you've loaded the map
   var update = {
     userToNotify: userid,
-    username: Active.Mapper.get('name'),
-    avatar: Active.Mapper.get('image'),
-    userid: Active.Mapper.id,
+    username: map.Active.Mapper.get('name'),
+    avatar: map.Active.Mapper.get('image'),
+    userid: map.Active.Mapper.id,
     userinconversation: self.inConversation,
-    mapid: Active.Map.id
+    mapid: map.Active.Map.id
   }
   self.socket.emit(SEND_MAPPER_INFO, update)
 }
 
-export const joinCall = self => () => {
+export const joinCall = (self, map) => () => {
   self.webrtc.off('readyToCall')
   self.webrtc.once('readyToCall', function() {
     self.videoInitialized = true
@@ -63,26 +61,26 @@ export const joinCall = self => () => {
       $('#wrapper').append(self.localVideo.view.$container)
     }
     self.room.join()
-    ChatView.conversationInProgress(true)
+    map.ChatView.conversationInProgress(true)
   })
   self.inConversation = true
   self.socket.emit(JOIN_CALL, {
-    mapid: Active.Map.id,
-    id: Active.Mapper.id
+    mapid: map.Active.Map.id,
+    id: map.Active.Mapper.id
   })
   self.webrtc.startLocalVideo()
   GlobalUI.clearNotify()
-  ChatView.mapperJoinedCall(Active.Mapper.id)
+  map.ChatView.mapperJoinedCall(map.Active.Mapper.id)
 }
 
-export const leaveCall = self => () => {
+export const leaveCall = (self, map) => () => {
   self.socket.emit(LEAVE_CALL, {
-    mapid: Active.Map.id,
-    id: Active.Mapper.id
+    mapid: map.Active.Map.id,
+    id: map.Active.Mapper.id
   })
 
-  ChatView.mapperLeftCall(Active.Mapper.id)
-  ChatView.leaveConversation() // the conversation will carry on without you
+  map.ChatView.mapperLeftCall(map.Active.Mapper.id)
+  map.ChatView.leaveConversation() // the conversation will carry on without you
   self.room.leaveVideoOnly()
   self.inConversation = false
   self.localVideo.view.$container.hide()
@@ -94,74 +92,73 @@ export const leaveCall = self => () => {
   }
 }
 
-export const acceptCall = self => userid => {
-  ChatView.sound.stop(self.soundId)
+export const acceptCall = (self, map) => userid => {
+  map.ChatView.sound.stop(self.soundId)
   self.socket.emit(ACCEPT_CALL, {
-    mapid: Active.Map.id,
-    invited: Active.Mapper.id,
+    mapid: map.Active.Map.id,
+    invited: map.Active.Mapper.id,
     inviter: userid
   })
-  $.post('/maps/' + Active.Map.id + '/events/conversation')
+  $.post('/maps/' + map.Active.Map.id + '/events/conversation')
   self.joinCall()
   GlobalUI.clearNotify()
 }
 
-export const denyCall = self => userid => {
-  ChatView.sound.stop(self.soundId)
+export const denyCall = (self, map) => userid => {
+  map.ChatView.sound.stop(self.soundId)
   self.socket.emit(DENY_CALL, {
-    mapid: Active.Map.id,
-    invited: Active.Mapper.id,
+    mapid: map.Active.Map.id,
+    invited: map.Active.Mapper.id,
     inviter: userid
   })
   GlobalUI.clearNotify()
 }
 
-export const denyInvite = self => userid => {
-  ChatView.sound.stop(self.soundId)
+export const denyInvite = (self, map) => userid => {
+  map.ChatView.sound.stop(self.soundId)
   self.socket.emit(DENY_INVITE, {
-    mapid: Active.Map.id,
-    invited: Active.Mapper.id,
+    mapid: map.Active.Map.id,
+    invited: map.Active.Mapper.id,
     inviter: userid
   })
   GlobalUI.clearNotify()
 }
 
-export const inviteACall = self => userid => {
+export const inviteACall = (self, map) => userid => {
   self.socket.emit(INVITE_A_CALL, {
-    mapid: Active.Map.id,
-    inviter: Active.Mapper.id,
+    mapid: map.Active.Map.id,
+    inviter: map.Active.Mapper.id,
     invited: userid
   })
-  ChatView.invitationPending(userid)
+  map.ChatView.invitationPending(userid)
   GlobalUI.clearNotify()
 }
 
-export const inviteToJoin = self => userid => {
+export const inviteToJoin = (self, map) => userid => {
   self.socket.emit(INVITE_TO_JOIN, {
-    mapid: Active.Map.id,
-    inviter: Active.Mapper.id,
+    mapid: map.Active.Map.id,
+    inviter: map.Active.Mapper.id,
     invited: userid
   })
-  ChatView.invitationPending(userid)
+  map.ChatView.invitationPending(userid)
 }
 
-export const sendCoords = self => coords => {
-  var map = Active.Map
-  var mapper = Active.Mapper
+export const sendCoords = (self, map) => coords => {
+  var map = map.Active.Map
+  var mapper = map.Active.Mapper
   if (map && map.authorizeToEdit(mapper)) {
     var update = {
       usercoords: coords,
-      userid: Active.Mapper.id,
-      mapid: Active.Map.id
+      userid: map.Active.Mapper.id,
+      mapid: map.Active.Map.id
     }
     self.socket.emit(SEND_COORDS, update)
   }
 }
 
-export const dragTopic = self => positions => {
-  if (Active.Map) {
-    positions.mapid = Active.Map.id
+export const dragTopic = (self, map) => positions => {
+  if (map.Active.Map) {
+    positions.mapid = map.Active.Map.id
     self.socket.emit(DRAG_TOPIC, positions)
   }
 }
-

@@ -6,7 +6,7 @@ import { browserHistory } from 'react-router'
 import GlobalUI, { ReactApp } from '../GlobalUI'
 import Util from '../Util'
 
-const InfoBox = ({Active, DataModel}) => {
+const InfoBox = (map) => {
 const toExport = {
   isOpen: false,
   selectingPermission: false,
@@ -86,13 +86,13 @@ const toExport = {
   load: function() {
     var self = toExport
 
-    var map = Active.Map
+    var map = map.Active.Map
 
     var obj = map.pick('permission', 'topic_count', 'synapse_count')
 
-    var isCreator = map.authorizePermissionChange(Active.Mapper)
-    var canEdit = map.authorizeToEdit(Active.Mapper)
-    var relevantPeople = map.get('permission') === 'commons' ? DataModel.Mappers : DataModel.Collaborators
+    var isCreator = map.authorizePermissionChange(map.Active.Mapper)
+    var canEdit = map.authorizeToEdit(map.Active.Mapper)
+    var relevantPeople = map.get('permission') === 'commons' ? map.DataModel.Mappers : map.DataModel.Collaborators
     var shareable = map.get('permission') !== 'private'
 
     obj['name'] = canEdit ? Hogan.compile(self.nameHTML).render({id: map.id, name: map.get('name')}) : map.get('name')
@@ -139,8 +139,8 @@ const toExport = {
 
     $('.mapInfoName .best_in_place_name').unbind('ajax:success').bind('ajax:success', function() {
       var name = $(this).html()
-      Active.Map.set('name', name)
-      Active.Map.trigger('saved')
+      map.Active.Map.set('name', name)
+      map.Active.Map.trigger('saved')
       // mobile menu
       $('#header_content').html(name)
       $('.maptoExport').removeClass('mapRequestTitle')
@@ -150,8 +150,8 @@ const toExport = {
 
     $('.mapInfoDesc .best_in_place_desc').unbind('ajax:success').bind('ajax:success', function() {
       var desc = $(this).html()
-      Active.Map.set('desc', desc)
-      Active.Map.trigger('saved')
+      map.Active.Map.set('desc', desc)
+      map.Active.Map.trigger('saved')
     })
 
     $('.mapInfoDesc .best_in_place_desc, .mapInfoName .best_in_place_name').unbind('keypress').keypress(function(e) {
@@ -186,7 +186,7 @@ const toExport = {
   addTypeahead: function() {
     var self = toExport
 
-    if (!Active.Map) return
+    if (!map.Active.Map) return
 
     // for autocomplete
     var collaborators = {
@@ -217,7 +217,7 @@ const toExport = {
     }
 
     // for adding map collaborators, who will have edit rights
-    if (Active.Mapper && Active.Mapper.id === Active.Map.get('user_id')) {
+    if (map.Active.Mapper && map.Active.Mapper.id === map.Active.Map.get('user_id')) {
       $('.collaboratorSearchField').typeahead(
         {
           highlight: false
@@ -232,24 +232,24 @@ const toExport = {
   },
   removeCollaborator: function(collaboratorId) {
     var self = toExport
-    DataModel.Collaborators.remove(DataModel.Collaborators.get(collaboratorId))
-    var mapperIds = DataModel.Collaborators.models.map(function(mapper) { return mapper.id })
-    $.post('/maps/' + Active.Map.id + '/access', { access: mapperIds })
+    map.DataModel.Collaborators.remove(map.DataModel.Collaborators.get(collaboratorId))
+    var mapperIds = map.DataModel.Collaborators.models.map(function(mapper) { return mapper.id })
+    $.post('/maps/' + map.Active.Map.id + '/access', { access: mapperIds })
     self.updateNumbers()
   },
   addCollaborator: function(newCollaboratorId) {
     var self = toExport
 
-    if (DataModel.Collaborators.get(newCollaboratorId)) {
+    if (map.DataModel.Collaborators.get(newCollaboratorId)) {
       GlobalUI.notifyUser('That user already has access')
       return
     }
 
     function callback(mapper) {
-      DataModel.Collaborators.add(mapper)
-      var mapperIds = DataModel.Collaborators.models.map(function(mapper) { return mapper.id })
-      $.post('/maps/' + Active.Map.id + '/access', { access: mapperIds })
-      var name = DataModel.Collaborators.get(newCollaboratorId).get('name')
+      map.DataModel.Collaborators.add(mapper)
+      var mapperIds = map.DataModel.Collaborators.models.map(function(mapper) { return mapper.id })
+      $.post('/maps/' + map.Active.Map.id + '/access', { access: mapperIds })
+      var name = map.DataModel.Collaborators.get(newCollaboratorId).get('name')
       GlobalUI.notifyUser(name + ' will be notified')
       self.updateNumbers()
     }
@@ -269,13 +269,13 @@ const toExport = {
     $('.maptoExport .mapPermission').removeClass('commons public private').addClass(perm)
   },
   createContributorList: function() {
-    var relevantPeople = Active.Map.get('permission') === 'commons' ? DataModel.Mappers : DataModel.Collaborators
-    var activeMapperIsCreator = Active.Mapper && Active.Mapper.id === Active.Map.get('user_id')
+    var relevantPeople = map.Active.Map.get('permission') === 'commons' ? map.DataModel.Mappers : map.DataModel.Collaborators
+    var activeMapperIsCreator = map.Active.Mapper && map.Active.Mapper.id === map.Active.Map.get('user_id')
     var string = ''
     string += '<ul>'
 
     relevantPeople.each(function(m) {
-      var isCreator = Active.Map.get('user_id') === m.get('id')
+      var isCreator = map.Active.Map.get('user_id') === m.get('id')
       string += '<li><a href="/explore/mapper/' + m.get('id') + '">' + '<img class="rtUserImage" width="25" height="25" src="' + m.get('image') + '" />' + m.get('name')
       if (isCreator) string += ' (creator)'
       string += '</a>'
@@ -291,11 +291,11 @@ const toExport = {
     return string
   },
   updateNumbers: function() {
-    if (!Active.Map) return
+    if (!map.Active.Map) return
 
     const self = toExport
 
-    var relevantPeople = Active.Map.get('permission') === 'commons' ? DataModel.Mappers : DataModel.Collaborators
+    var relevantPeople = map.Active.Map.get('permission') === 'commons' ? map.DataModel.Mappers : map.DataModel.Collaborators
 
     let contributorsClass = ''
     if (relevantPeople.length === 2) {
@@ -316,8 +316,8 @@ const toExport = {
     $('.mapContributors .tip').unbind().click(function(event) {
       event.stopPropagation()
     })
-    $('.mapTopics').text(DataModel.Topics.length)
-    $('.mapSynapses').text(DataModel.Synapses.length)
+    $('.mapTopics').text(map.DataModel.Topics.length)
+    $('.mapSynapses').text(map.DataModel.Synapses.length)
 
     $('.mapEditedAt').html('<span>Last edited: </span>' + Util.nowDateFormatted())
   },
@@ -350,10 +350,10 @@ const toExport = {
 
     self.selectingPermission = false
     var permission = $(this).attr('class')
-    Active.Map.save({
+    map.Active.Map.save({
       permission: permission
     })
-    Active.Map.updateMapWrapper()
+    map.Active.Map.updateMapWrapper()
     const shareable = permission === 'private' ? '' : 'shareable'
     $('.mapPermission').removeClass('commons public private minimize').addClass(permission)
     $('.mapPermission .permissionSelect').remove()
@@ -365,13 +365,13 @@ const toExport = {
     confirmString += 'This action is irreversible. It will not delete the topics and synapses on the map.'
 
     var doIt = window.confirm(confirmString)
-    var map = Active.Map
-    var mapper = Active.Mapper
+    var map = map.Active.Map
+    var mapper = map.Active.Mapper
     var authorized = map.authorizePermissionChange(mapper)
 
     if (doIt && authorized) {
       toExport.close()
-      DataModel.Maps.Active.remove(map)
+      DataModel.Maps.map.Active.remove(map)
       DataModel.Maps.Featured.remove(map)
       DataModel.Maps.Mine.remove(map)
       DataModel.Maps.Shared.remove(map)

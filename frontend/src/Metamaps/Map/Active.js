@@ -1,8 +1,8 @@
-const Active = (map = null, mapper = null, topic = null) => {
+const Active = () => {
   return {
-    Map: map,
-    Mapper: mapper,
-    Topic: topic
+    Map: null,
+    Mapper: null,
+    Topic: null
   }
 }
 

@@ -3,9 +3,9 @@
 import parse from 'csv-parse'
 import _ from 'lodash'
 
-import GlobalUI from './GlobalUI'
+import GlobalUI from '../GlobalUI'
 
-const Import = ({Active, AutoLayout, DataModel, Map, Synapse, Topic}) => {
+const Import = (map) => {
 const toExport = {
   // note that user is not imported
   topicWhitelist: [
@@ -213,7 +213,7 @@ const toExport = {
     parsedTopics.forEach(topic => {
       let coords = { x: topic.x, y: topic.y }
       if (!coords.x || !coords.y) {
-        coords = AutoLayout.getNextCoord({ mappings: DataModel.Mappings })
+        coords = map.AutoLayout.getNextCoord({ mappings: map.DataModel.Mappings })
       }
 
       if (!topic.name && topic.link ||
@@ -240,10 +240,10 @@ const toExport = {
     parsedSynapses.forEach(function(synapse) {
       // only createSynapseWithParameters once both topics are persisted
       // if there isn't a cidMapping, check by topic name instead
-      var topic1 = DataModel.Topics.get(self.cidMappings[synapse.topic1])
-      if (!topic1) topic1 = DataModel.Topics.findWhere({ name: synapse.topic1 })
-      var topic2 = DataModel.Topics.get(self.cidMappings[synapse.topic2])
-      if (!topic2) topic2 = DataModel.Topics.findWhere({ name: synapse.topic2 })
+      var topic1 = map.DataModel.Topics.get(self.cidMappings[synapse.topic1])
+      if (!topic1) topic1 = map.DataModel.Topics.findWhere({ name: synapse.topic1 })
+      var topic2 = map.DataModel.Topics.get(self.cidMappings[synapse.topic2])
+      if (!topic2) topic2 = map.DataModel.Topics.findWhere({ name: synapse.topic2 })
 
       if (!topic1 || !topic2) {
         console.error("One of the two topics doesn't exist!")
@@ -282,8 +282,8 @@ const toExport = {
       console.warn("Couldn't find metacode " + metacodeName + ' so used Wildcard instead.')
     }
 
-    const topicPermision = permission || Active.Map.get('permission')
-    var deferToMapId = permission === topicPermision ? Active.Map.get('id') : null
+    const topicPermision = permission || map.Active.Map.get('permission')
+    var deferToMapId = permission === topicPermision ? map.Active.Map.get('id') : null
     var topic = new DataModel.Topic({
       name: name,
       metacode_id: metacode.id,
@@ -292,7 +292,7 @@ const toExport = {
       desc: desc || '',
       link: link || ''
     })
-    DataModel.Topics.add(topic)
+    map.DataModel.Topics.add(topic)
 
     if (importId !== null && importId !== undefined) {
       self.cidMappings[importId] = topic.cid
@@ -304,14 +304,14 @@ const toExport = {
       mappable_id: topic.cid,
       mappable_type: 'Topic'
     })
-    DataModel.Mappings.add(mapping)
+    map.DataModel.Mappings.add(mapping)
 
     // this function also includes the creation of the topic in the database
-    Topic.renderTopic(mapping, topic, true, true, {
+    map.Topic.renderTopic(mapping, topic, true, true, {
       success: opts.success
     })
 
-    Map.setHasLearnedTopicCreation(true)
+    map.Map.setHasLearnedTopicCreation(true)
   },
 
   createSynapseWithParameters: function(desc, category, permission,
@@ -331,21 +331,21 @@ const toExport = {
       topic1_id: topic1.id,
       topic2_id: topic2.id
     })
-    DataModel.Synapses.add(synapse)
+    map.DataModel.Synapses.add(synapse)
 
     var mapping = new DataModel.Mapping({
       mappable_type: 'Synapse',
       mappable_id: synapse.cid
     })
-    DataModel.Mappings.add(mapping)
+    map.DataModel.Mappings.add(mapping)
 
-    Synapse.renderSynapse(mapping, synapse, node1, node2, true)
+    map.Synapse.renderSynapse(mapping, synapse, node1, node2, true)
   },
 
   handleURL: function(url, opts = {}) {
     let coords = opts.coords
     if (!coords || coords.x === undefined || coords.y === undefined) {
-      coords = AutoLayout.getNextCoord({ mappings: DataModel.Mappings })
+      coords = map.AutoLayout.getNextCoord({ mappings: map.DataModel.Mappings })
     }
 
     const name = opts.name || 'Link'

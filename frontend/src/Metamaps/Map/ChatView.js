@@ -5,7 +5,7 @@ import { Howl } from 'howler'
 
 import ReactApp from '../GlobalUI/ReactApp'
 
-const ChatView = ({Active, DataModel}) => {
+const ChatView = (map) => {
 const toExport =  {
   isOpen: false,
   unreadMessages: 0,
@@ -39,7 +39,7 @@ const toExport =  {
     self.render()
   },
   render: () => {
-    if (!Active.Map) return
+    if (!map.Active.Map) return
     const self = toExport
     ReactApp.render()
   },
@@ -127,7 +127,7 @@ const toExport =  {
     if (toExport.alertSound) toExport.sound.play('sendchat')
     var m = new DataModel.Message({
       message: message.message,
-      resource_id: Active.Map.id,
+      resource_id: map.Active.Map.id,
       resource_type: 'Map'
     })
     m.save(null, {

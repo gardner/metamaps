@@ -1,8 +1,8 @@
 /* global $ */
 
-import Util from './Util'
+import Util from '../Util'
 
-const PasteInput = ({Import, Visualize}) => {
+const PasteInput = (map) => {
 const toReturn = {
   // thanks to https://github.com/kevva/url-regex
   // eslint-disable-next-line no-useless-escape
@@ -24,7 +24,7 @@ const toReturn = {
       if (event.target.id !== 'infovis-canvas') return
 
       e.preventDefault()
-      var coords = Util.pixelsToCoords(Visualize.mGraph, { x: e.clientX, y: e.clientY })
+      var coords = Util.pixelsToCoords(map.Visualize.mGraph, { x: e.clientX, y: e.clientY })
       if (e.dataTransfer.files.length > 0) {
         self.handleFile(e.dataTransfer.files[0], coords)
       }
@@ -66,14 +66,14 @@ const toReturn = {
     var self = toReturn
 
     if (text.match(self.URL_REGEX)) {
-      Import.handleURL(text, coords)
+      map.Import.handleURL(text, coords)
     } else if (text[0] === '{') {
-      Import.handleJSON(text)
+      map.Import.handleJSON(text)
     } else if (text.match(/\t/)) {
-      Import.handleTSV(text)
+      map.Import.handleTSV(text)
     } else {
       // just try to see if CSV works
-      Import.handleCSV(text)
+      map.Import.handleCSV(text)
     }
   }
 }

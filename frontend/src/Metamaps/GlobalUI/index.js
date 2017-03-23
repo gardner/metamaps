@@ -2,8 +2,6 @@
 
 import clipboard from 'clipboard-js'
 
-import Create from '../Create'
-
 import ReactApp from './ReactApp'
 import Search from './Search'
 import CreateMap from './CreateMap'
@@ -67,7 +65,7 @@ const GlobalUI = {
     }, 200)
 
     if (which === 'switchMetacodes') {
-      Create.isSwitchingSet = true
+      ReactApp.openMap && (ReactApp.openMap.Create.isSwitchingSet = true)
     }
   },
 
@@ -91,8 +89,8 @@ const GlobalUI = {
 
     if (self.lightbox === 'forkmap') GlobalUI.CreateMap.reset('fork_map')
     if (self.lightbox === 'newmap') GlobalUI.CreateMap.reset('new_map')
-    if (Create && Create.isSwitchingSet) {
-      Create.cancelMetacodeSetSwitch()
+    if (ReactApp.openMap && ReactApp.openMap.Create.isSwitchingSet) {
+      ReactApp.openMap.Create.cancelMetacodeSetSwitch()
     }
     self.lightbox = null
   },

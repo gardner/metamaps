@@ -2,9 +2,9 @@
 
 import { indexOf } from 'lodash'
 
-import Mapper from './Mapper'
+import Mapper from '../Mapper'
 
-const Cable = ({Active, Control, DataModel, Map, Synapse, Topic, ChatView, Visualize}) => {
+const Cable = (map) => {
 const toExport = {
   subscribeToMap: id => {
     let self = toExport
@@ -25,12 +25,12 @@ const toExport = {
     // containing only the information we need to determine whether the active mapper
     // can view this synapse and the two topics it connects,
     // then if we determine it can, we make a call for the full model
-    const m = Active.Mapper
+    const m = map.Active.Mapper
     const s = new DataModel.Synapse(event.synapse)
     const t1 = new DataModel.Topic(event.topic1)
     const t2 = new DataModel.Topic(event.topic2)
 
-    if (t1.authorizeToShow(m) && t2.authorizeToShow(m) && s.authorizeToShow(m) && !DataModel.Synapses.get(event.synapse.id)) {
+    if (t1.authorizeToShow(m) && t2.authorizeToShow(m) && s.authorizeToShow(m) && !map.DataModel.Synapses.get(event.synapse.id)) {
       // refactor the heck outta this, its adding wicked wait time
       var topic1, topic2, node1, node2, synapse, mapping, cancel, mapper
 
@@ -41,24 +41,24 @@ const toExport = {
           topic2 = synapse.getTopic2()
           node2 = topic2.get('node')
 
-          Synapse.renderSynapse(mapping, synapse, node1, node2, false)
+          map.Synapse.renderSynapse(mapping, synapse, node1, node2, false)
         } else if (!cancel) {
           setTimeout(waitThenRenderSynapse, 10)
         }
       }
 
-      mapper = DataModel.Mappers.get(event.synapse.user_id)
+      mapper = map.DataModel.Mappers.get(event.synapse.user_id)
       if (mapper === undefined) {
         Mapper.get(event.synapse.user_id, function(m) {
-          DataModel.Mappers.add(m)
+          map.DataModel.Mappers.add(m)
           mapper = m
         })
       }
       $.ajax({
         url: '/synapses/' + event.synapse.id + '.json',
         success: function(response) {
-          DataModel.Synapses.add(response)
-          synapse = DataModel.Synapses.get(response.id)
+          map.DataModel.Synapses.add(response)
+          synapse = map.DataModel.Synapses.get(response.id)
         },
         error: function() {
           cancel = true
@@ -67,8 +67,8 @@ const toExport = {
       $.ajax({
         url: '/mappings/' + event.mapping_id + '.json',
         success: function(response) {
-          DataModel.Mappings.add(response)
-          mapping = DataModel.Mappings.get(response.id)
+          map.DataModel.Mappings.add(response)
+          mapping = map.DataModel.Mappings.get(response.id)
         },
         error: function() {
           cancel = true
@@ -79,7 +79,7 @@ const toExport = {
   },
   synapseUpdated: event => {
     // TODO: handle case where permission changed
-    var synapse = DataModel.Synapses.get(event.id)
+    var synapse = map.DataModel.Synapses.get(event.id)
     if (synapse) {
       // edge reset necessary because fetch causes model reset
       var edge = synapse.get('edge')
@@ -92,12 +92,12 @@ const toExport = {
     }
   },
   synapseRemoved: event => {
-    var synapse = DataModel.Synapses.get(event.id)
+    var synapse = map.DataModel.Synapses.get(event.id)
     if (synapse) {
       var edge = synapse.get('edge')
       var mapping = synapse.getMapping()
       if (edge.getData('mappings').length - 1 === 0) {
-        Control.hideEdge(edge)
+        map.Control.hideEdge(edge)
       }
 
       var index = indexOf(edge.getData('synapses'), synapse)
@@ -106,41 +106,41 @@ const toExport = {
       if (edge.getData('displayIndex')) {
         delete edge.data.$displayIndex
       }
-      DataModel.Synapses.remove(synapse)
-      DataModel.Mappings.remove(mapping)
+      map.DataModel.Synapses.remove(synapse)
+      map.DataModel.Mappings.remove(mapping)
     }
   },
   topicAdded: event => {
-    const m = Active.Mapper
+    const m = map.Active.Mapper
     // we receive a contentless model from the server
     // containing only the information we need to determine whether the active mapper
     // can view this topic, then if we determine it can, we make a call for the full model
     const t = new DataModel.Topic(event.topic)
 
-    if (t.authorizeToShow(m) && !DataModel.Topics.get(event.topic.id)) {
+    if (t.authorizeToShow(m) && !map.DataModel.Topics.get(event.topic.id)) {
       // refactor the heck outta this, its adding wicked wait time
       var topic, mapping, mapper, cancel
 
       const waitThenRenderTopic = () => {
         if (topic && mapping && mapper) {
-          Topic.renderTopic(mapping, topic, false, false)
+          map.Topic.renderTopic(mapping, topic, false, false)
         } else if (!cancel) {
           setTimeout(waitThenRenderTopic, 10)
         }
       }
 
-      mapper = DataModel.Mappers.get(event.topic.user_id)
+      mapper = map.DataModel.Mappers.get(event.topic.user_id)
       if (mapper === undefined) {
         Mapper.get(event.topic.user_id, function(m) {
-          DataModel.Mappers.add(m)
+          map.DataModel.Mappers.add(m)
           mapper = m
         })
       }
       $.ajax({
         url: '/topics/' + event.topic.id + '.json',
         success: function(response) {
-          DataModel.Topics.add(response)
-          topic = DataModel.Topics.get(response.id)
+          map.DataModel.Topics.add(response)
+          topic = map.DataModel.Topics.get(response.id)
         },
         error: function() {
           cancel = true
@@ -149,8 +149,8 @@ const toExport = {
       $.ajax({
         url: '/mappings/' + event.mapping_id + '.json',
         success: function(response) {
-          DataModel.Mappings.add(response)
-          mapping = DataModel.Mappings.get(response.id)
+          map.DataModel.Mappings.add(response)
+          mapping = map.DataModel.Mappings.get(response.id)
         },
         error: function() {
           cancel = true
@@ -161,7 +161,7 @@ const toExport = {
   },
   topicUpdated: event => {
     // TODO: handle case where permission changed
-    var topic = DataModel.Topics.get(event.id)
+    var topic = map.DataModel.Topics.get(event.id)
     if (topic) {
       var node = topic.get('node')
       topic.fetch({
@@ -174,38 +174,38 @@ const toExport = {
   },
   topicMoved: event => {
     var topic, node, mapping
-    if (Active.Map) {
-      topic = DataModel.Topics.get(event.id)
-      mapping = DataModel.Mappings.get(event.mapping_id)
+    if (map.Active.Map) {
+      topic = map.DataModel.Topics.get(event.id)
+      mapping = map.DataModel.Mappings.get(event.mapping_id)
       mapping.set('xloc', event.x)
       mapping.set('yloc', event.y)
       if (topic) node = topic.get('node')
       if (node) node.pos.setc(event.x, event.y)
-      Visualize.mGraph.plot()
+      map.Visualize.mGraph.plot()
     }
   },
   topicRemoved: event => {
-    var topic = DataModel.Topics.get(event.id)
+    var topic = map.DataModel.Topics.get(event.id)
     if (topic) {
       var node = topic.get('node')
       var mapping = topic.getMapping()
-      Control.hideNode(node.id)
-      DataModel.Topics.remove(topic)
-      DataModel.Mappings.remove(mapping)
+      map.Control.hideNode(node.id)
+      map.DataModel.Topics.remove(topic)
+      map.DataModel.Mappings.remove(mapping)
     }
   },
   messageCreated: event => {
-    if (Active.Mapper && Active.Mapper.id === event.message.user_id) return
-    ChatView.addMessages(new DataModel.MessageCollection(event.message))
+    if (map.Active.Mapper && map.Active.Mapper.id === event.message.user_id) return
+    map.ChatView.addMessages(new DataModel.MessageCollection(event.message))
   },
   mapUpdated: event => {
-    var map = Active.Map
-    var couldEditBefore = map.authorizeToEdit(Active.Mapper)
+    var map = map.Active.Map
+    var couldEditBefore = map.authorizeToEdit(map.Active.Mapper)
     var idBefore = map.id
     map.fetch({
       success: function(model, response) {
         var idNow = model.id
-        var canEditNow = model.authorizeToEdit(Active.Mapper)
+        var canEditNow = model.authorizeToEdit(map.Active.Mapper)
         if (idNow !== idBefore) {
           Map.leavePrivateMap() // this means the map has been changed to private
         } else if (couldEditBefore && !canEditNow) {

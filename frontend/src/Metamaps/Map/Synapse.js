@@ -1,24 +1,24 @@
 /* global $ */
 
-import Settings from './Settings'
+import Settings from '../Settings'
 
 const noOp = () => {}
 
-const Synapse = ({Active, Control, Create, DataModel, Map, Selected, Visualize}) => {
+const Synapse = (map) => {
 const toExport = {
   // this function is to retrieve a synapse JSON object from the database
   // @param id = the id of the synapse to retrieve
   get: function(id, callback = noOp) {
     // if the desired topic is not yet in the local topic repository, fetch it
-    if (DataModel.Synapses.get(id) === undefined) {
+    if (map.DataModel.Synapses.get(id) === undefined) {
       $.ajax({
         url: '/synapses/' + id + '.json',
         success: function(data) {
-          DataModel.Synapses.add(data)
-          callback(DataModel.Synapses.get(id))
+          map.DataModel.Synapses.add(data)
+          callback(map.DataModel.Synapses.get(id))
         }
       })
-    } else callback(DataModel.Synapses.get(id))
+    } else callback(map.DataModel.Synapses.get(id))
   },
 
   renderSynapse: function(mapping, synapse, node1, node2, createNewInDB) {
@@ -26,19 +26,19 @@ const toExport = {
 
     var newedge = synapse.createEdge(mapping)
 
-    Visualize.mGraph.graph.addAdjacence(node1, node2, newedge.data)
-    edgeOnViz = Visualize.mGraph.graph.getAdjacence(node1.id, node2.id)
+    map.Visualize.mGraph.graph.addAdjacence(node1, node2, newedge.data)
+    edgeOnViz = map.Visualize.mGraph.graph.getAdjacence(node1.id, node2.id)
     synapse.set('edge', edgeOnViz)
     synapse.updateEdge() // links the synapse and the mapping to the edge
 
-    Control.selectEdge(edgeOnViz)
+    map.Control.selectEdge(edgeOnViz)
 
     var synapseSuccessCallback = function(synapseModel, response) {
-      if (Active.Map) {
+      if (map.Active.Map) {
         mapping.save({ mappable_id: synapseModel.id }, {
           success: function(model, response) {
-            if (Active.Mapper.get('follow_map_on_contributed')) {
-              Active.Mapper.followMap(Active.Map.id)
+            if (map.Active.Mapper.get('follow_map_on_contributed')) {
+              map.Active.Mapper.followMap(map.Active.Map.id)
             }
           },
           error: function(model, response) {
@@ -56,11 +56,11 @@ const toExport = {
             console.log('error saving synapse to database')
           }
         })
-      } else if (!synapse.isNew() && Active.Map) {
+      } else if (!synapse.isNew() && map.Active.Map) {
         mapping.save(null, {
           success: function(model, response) {
-            if (Active.Mapper.get('follow_map_on_contributed')) {
-              Active.Mapper.followMap(Active.Map.id)
+            if (map.Active.Mapper.get('follow_map_on_contributed')) {
+              map.Active.Mapper.followMap(map.Active.Map.id)
             }
           },
           error: function(model, response) {
@@ -84,38 +84,38 @@ const toExport = {
     // for each node in this array we will create a synapse going to the position2 node.
     var synapsesToCreate = []
 
-    topic2 = DataModel.Topics.get(Create.newSynapse.topic2id)
+    topic2 = map.DataModel.Topics.get(map.Create.newSynapse.topic2id)
     node2 = topic2.get('node')
 
-    var len = Selected.Nodes.length
+    var len = map.Selected.Nodes.length
     if (len === 0) {
-      topic1 = DataModel.Topics.get(Create.newSynapse.topic1id)
+      topic1 = map.DataModel.Topics.get(map.Create.newSynapse.topic1id)
       synapsesToCreate[0] = topic1.get('node')
     } else if (len > 0) {
-      synapsesToCreate = Selected.Nodes
+      synapsesToCreate = map.Selected.Nodes
     }
 
-    for (var i = 0; i < synapsesToCreate.length; i++) {
+    for (var i = 0; i < synapsesTomap.Create.length; i++) {
       node1 = synapsesToCreate[i]
       topic1 = node1.getData('topic')
       synapse = new DataModel.Synapse({
-        desc: Create.newSynapse.description,
+        desc: map.Create.newSynapse.description,
         topic1_id: topic1.isNew() ? topic1.cid : topic1.id,
         topic2_id: topic2.isNew() ? topic2.cid : topic2.id
       })
-      DataModel.Synapses.add(synapse)
+      map.DataModel.Synapses.add(synapse)
 
       mapping = new DataModel.Mapping({
         mappable_type: 'Synapse',
         mappable_id: synapse.cid
       })
-      DataModel.Mappings.add(mapping)
+      map.DataModel.Mappings.add(mapping)
 
       // this function also includes the creation of the synapse in the database
       self.renderSynapse(mapping, synapse, node1, node2, true)
     } // for each in synapsesToCreate
 
-    Create.newSynapse.hide()
+    map.Create.newSynapse.hide()
   },
   getSynapseFromAutocomplete: function(id) {
     var self = toExport
@@ -125,12 +125,12 @@ const toExport = {
         mappable_type: 'Synapse',
         mappable_id: synapse.id
       })
-      DataModel.Mappings.add(mapping)
-      const topic1 = DataModel.Topics.get(Create.newSynapse.topic1id)
+      map.DataModel.Mappings.add(mapping)
+      const topic1 = map.DataModel.Topics.get(map.Create.newSynapse.topic1id)
       const node1 = topic1.get('node')
-      const topic2 = DataModel.Topics.get(Create.newSynapse.topic2id)
+      const topic2 = map.DataModel.Topics.get(map.Create.newSynapse.topic2id)
       const node2 = topic2.get('node')
-      Create.newSynapse.hide()
+      map.Create.newSynapse.hide()
       self.renderSynapse(mapping, synapse, node1, node2, true)
     })
   }

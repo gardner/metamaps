@@ -1,8 +1,8 @@
-/* global $, Hogan, Bloodhound, CanvasLoader */
+ReactApp.currentUserReactApp.currentUser/* global $, Hogan, Bloodhound, CanvasLoader */
 
 import { browserHistory } from 'react-router'
 
-import Active from '../Active'
+import ReactApp from './ReactApp'
 
 const Search = {
   locked: false,
@@ -41,8 +41,8 @@ const Search = {
   startTypeahead: function() {
     var self = Search
 
-    var mapheader = Active.Mapper ? '<div class="searchMapsHeader searchHeader"><h3 class="search-heading">Maps</h3><input type="checkbox" class="limitToMe" id="limitMapsToMe"></input><label for="limitMapsToMe" class="limitToMeLabel">added by me</label><div class="minimizeResults minimizeMapResults"></div><div class="clearfloat"></div></div>' : '<div class="searchMapsHeader searchHeader"><h3 class="search-heading">Maps</h3><div class="minimizeResults minimizeMapResults"></div><div class="clearfloat"></div></div>'
-    var topicheader = Active.Mapper ? '<div class="searchTopicsHeader searchHeader"><h3 class="search-heading">Topics</h3><input type="checkbox" class="limitToMe" id="limitTopicsToMe"></input><label for="limitTopicsToMe" class="limitToMeLabel">added by me</label><div class="minimizeResults minimizeTopicResults"></div><div class="clearfloat"></div></div>' : '<div class="searchTopicsHeader searchHeader"><h3 class="search-heading">Topics</h3><div class="minimizeResults minimizeTopicResults"></div><div class="clearfloat"></div></div>'
+    var mapheader = ReactApp.currentUser ? '<div class="searchMapsHeader searchHeader"><h3 class="search-heading">Maps</h3><input type="checkbox" class="limitToMe" id="limitMapsToMe"></input><label for="limitMapsToMe" class="limitToMeLabel">added by me</label><div class="minimizeResults minimizeMapResults"></div><div class="clearfloat"></div></div>' : '<div class="searchMapsHeader searchHeader"><h3 class="search-heading">Maps</h3><div class="minimizeResults minimizeMapResults"></div><div class="clearfloat"></div></div>'
+    var topicheader = ReactApp.currentUser ? '<div class="searchTopicsHeader searchHeader"><h3 class="search-heading">Topics</h3><input type="checkbox" class="limitToMe" id="limitTopicsToMe"></input><label for="limitTopicsToMe" class="limitToMeLabel">added by me</label><div class="minimizeResults minimizeTopicResults"></div><div class="clearfloat"></div></div>' : '<div class="searchTopicsHeader searchHeader"><h3 class="search-heading">Topics</h3><div class="minimizeResults minimizeTopicResults"></div><div class="clearfloat"></div></div>'
     var mapperheader = '<div class="searchMappersHeader searchHeader"><h3 class="search-heading">Mappers</h3><div class="minimizeResults minimizeMapperResults"></div><div class="clearfloat"></div></div>'
 
     var topics = {
@@ -71,8 +71,8 @@ const Search = {
           url: '/search/topics',
           prepare: function(query, settings) {
             settings.url += '?term=' + query
-            if (Active.Mapper && self.limitTopicsToMe) {
-              settings.url += '&user=' + Active.Mapper.id.toString()
+            if (ReactApp.currentUser && self.limitTopicsToMe) {
+              settings.url += '&user=' + ReactApp.currentUser.id.toString()
             }
             return settings
           }
@@ -104,8 +104,8 @@ const Search = {
           url: '/search/maps',
           prepare: function(query, settings) {
             settings.url += '?term=' + query
-            if (Active.Mapper && self.limitMapsToMe) {
-              settings.url += '&user=' + Active.Mapper.id.toString()
+            if (ReactApp.currentUser && self.limitMapsToMe) {
+              settings.url += '&user=' + ReactApp.currentUser.id.toString()
             }
             return settings
           }

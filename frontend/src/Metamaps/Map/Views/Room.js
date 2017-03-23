@@ -55,7 +55,7 @@ Room.prototype.init = function() {
   this.webrtc.webrtc.off('peerStreamAdded')
   this.webrtc.webrtc.off('peerStreamRemoved')
   this.webrtc.on('peerStreamAdded', function(peer) {
-    var mapper = Realtime.mappersOnMap[peer.nick]
+    var mapper = map.Realtime.mappersOnMap[peer.nick]
     peer.avatar = mapper.image
     peer.username = mapper.name
     if (self.isActiveRoom) {
