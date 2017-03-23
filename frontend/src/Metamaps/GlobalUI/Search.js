@@ -1,4 +1,4 @@
-ReactApp.currentUserReactApp.currentUser/* global $, Hogan, Bloodhound, CanvasLoader */
+/* global $, Hogan, Bloodhound, CanvasLoader */
 
 import { browserHistory } from 'react-router'
 

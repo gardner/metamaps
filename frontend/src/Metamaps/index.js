@@ -58,7 +58,6 @@ Metamaps.Synapse = Synapse
 Metamaps.SynapseCard = SynapseCard
 Metamaps.Topic = Topic
 Metamaps.Util = Util
-Metamaps.Views = Views
 Metamaps.Visualize = Visualize
 
 Metamaps.GlobalUI = GlobalUI
@@ -76,7 +75,6 @@ document.addEventListener('DOMContentLoaded', function() {
       Metamaps[prop].hasOwnProperty('init') &&
       typeof (Metamaps[prop].init) === 'function'
     ) {
-      console.log(prop)
       Metamaps[prop].init(Metamaps.ServerData)
     }
   }

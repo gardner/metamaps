@@ -91,8 +91,8 @@ const mapControl = {
       newMap.Active.Mapper = ReactApp.currentUser
       newMap.DataModel.Mappers = new MapperCollection(data.mappers)
       newMap.DataModel.Collaborators = new MapperCollection(data.collaborators)
-      newMap.DataModel.Topics = new TopicCollection(data.topics)
-      newMap.DataModel.Synapses = new SynapseCollection(data.synapses)
+      //newMap.DataModel.Topics = new TopicCollection(data.topics)
+      //newMap.DataModel.Synapses = new SynapseCollection(data.synapses)
       newMap.DataModel.Mappings = new MappingCollection(data.mappings)
       newMap.DataModel.Messages = data.messages
       newMap.DataModel.Stars = data.stars
@@ -127,15 +127,15 @@ const mapControl = {
   end: function(map) {
     $('.main').removeClass('compressed')
     $('.rightclickmenu').remove()
-    map.AutoLayout.resetSpiral()
-    map.TopicCard.hideCard()
-    map.map.SynapseCard.hideCard()
+    //map.AutoLayout.resetSpiral()
+    //map.TopicCard.hideCard()
+    map.SynapseCard.hideCard()
     map.Create.newTopic.hide(true) // true means force (and override pinned)
     map.Create.newSynapse.hide()
     map.InfoBox.close()
+    //map.Map.requests = []
+    //map.Map.hasLearnedTopicCreation = true
     map.Realtime.endActiveMap()
-    map.Map.requests = []
-    map.Map.hasLearnedTopicCreation = true
   }
 }
 export { mapControl }
@@ -441,6 +441,9 @@ const Map = (map) => {
 }
 Map.events = {
   editedByActiveMapper: 'Metamaps:Map:events:editedByActiveMapper'
+}
+Map.init = (serverData) => {
+  ChatView.init([serverData['sounds/MM_sounds.mp3'], serverData['sounds/MM_sounds.ogg']])
 }
 
 export { CheatSheet }

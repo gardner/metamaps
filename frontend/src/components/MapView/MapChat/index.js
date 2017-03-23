@@ -59,7 +59,7 @@ class MapChat extends Component {
 
   scroll = () => {
     // hack: figure out how to do this right
-    this.messagesDiv.scrollTop = this.messagesDiv.scrollHeight + 100
+    if (this.messagesDiv) this.messagesDiv.scrollTop = this.messagesDiv.scrollHeight + 100
   }
 
   toggleDrawer = () => {

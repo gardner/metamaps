@@ -4,6 +4,7 @@ import Backbone from 'backbone'
 import { Howl } from 'howler'
 
 import ReactApp from '../GlobalUI/ReactApp'
+import MessageCollection from '../DataModel/MessageCollection'
 
 const ChatView = (map) => {
 const toExport =  {
@@ -12,19 +13,6 @@ const toExport =  {
   messages: new Backbone.Collection(),
   conversationLive: false,
   isParticipating: false,
-  init: function(urls) {
-    const self = toExport
-    self.sound = new Howl({
-      src: urls,
-      sprite: {
-        joinmap: [0, 561],
-        leavemap: [1000, 592],
-        receivechat: [2000, 318],
-        sendchat: [3000, 296],
-        sessioninvite: [4000, 5393, true]
-      }
-    })
-  },
   setNewMap: function() {
     const self = toExport
     self.unreadMessages = 0
@@ -118,13 +106,13 @@ const toExport =  {
   addMessage: (message, isInitial, wasMe) => {
     const self = toExport
     if (!isInitial && !self.isOpen) self.unreadMessages += 1
-    if (!wasMe && !isInitial && self.alertSound) self.sound.play('receivechat')
+    if (!wasMe && !isInitial && self.alertSound) ChatView.sound.play('receivechat')
     self.messages.add(message)
     if (!isInitial && self.isOpen) self.render()
   },
   sendChatMessage: message => {
     var self = toExport
-    if (toExport.alertSound) toExport.sound.play('sendchat')
+    if (toExport.alertSound) ChatView.sound.play('sendchat')
     var m = new DataModel.Message({
       message: message.message,
       resource_id: map.Active.Map.id,
@@ -132,7 +120,7 @@ const toExport =  {
     })
     m.save(null, {
       success: function(model, response) {
-        self.addMessages(new DataModel.MessageCollection(model), false, true)
+        self.addMessages(new MessageCollection(model), false, true)
       },
       error: function(model, response) {
         console.log('error!', response)
@@ -150,7 +138,6 @@ const toExport =  {
 }
 return toExport
 }
-
 /**
  * @class
  * @static
@@ -164,6 +151,18 @@ ChatView.events = {
   cursorsOn: 'ChatView:cursorsOn',
   videosOff: 'ChatView:videosOff',
   videosOn: 'ChatView:videosOn'
+}
+ChatView.init = function(urls) {
+  ChatView.sound = new Howl({
+    src: urls,
+    sprite: {
+      joinmap: [0, 561],
+      leavemap: [1000, 592],
+      receivechat: [2000, 318],
+      sendchat: [3000, 296],
+      sessioninvite: [4000, 5393, true]
+    }
+  })
 }
 
 export default ChatView

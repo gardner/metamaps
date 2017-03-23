@@ -7,7 +7,6 @@ import VideoView from './VideoView'
 
 const Room = function(opts = {}) {
   this.isActiveRoom = false
-  this.socket = opts.socket
   this.webrtc = opts.webrtc
   this.room = opts.room
   this.config = opts.config

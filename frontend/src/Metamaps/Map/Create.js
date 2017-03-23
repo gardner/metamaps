@@ -266,7 +266,7 @@ const toExport = {
       })
       toExport.newTopic.beingCreated = true
       toExport.newTopic.name = ''
-      //Map.setHasLearnedTopicCreation(true)
+      map.Map.setHasLearnedTopicCreation(true)
     },
     hide: function(force) {
       if (force || !toExport.newTopic.pinned) {
@@ -277,7 +277,7 @@ const toExport = {
         toExport.newTopic.pinned = false
       }
       if (map.DataModel.Topics.length === 0) {
-        Map.setHasLearnedTopicCreation(false)
+        map.Map.setHasLearnedTopicCreation(false)
       }
       toExport.newTopic.beingCreated = false
     },

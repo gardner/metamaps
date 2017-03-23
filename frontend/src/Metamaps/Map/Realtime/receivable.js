@@ -4,15 +4,8 @@
 everthing in this file happens as a result of websocket events
 */
 
-import { JUNTO_UPDATED } from './events'
-
-import GlobalUI, { ReactApp } from '../../GlobalUI'
+import GlobalUI from '../../GlobalUI'
 import Util from '../../Util'
-
-export const juntoUpdated = (self, map) => state => {
-  ReactApp.juntoState = state
-  $(document).trigger(JUNTO_UPDATED)
-}
 
 /* All the following events are received through the nodejs realtime server
     and are done this way because they are transient data, not persisted to the server */

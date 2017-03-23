@@ -108,7 +108,7 @@ const ReactApp = {
       mobileTitleClick: (e) => self.openMap && self.openMap.InfoBox.toggleBox(e),
       openInviteLightbox: () => self.openLightbox('invite'),
       serverData: self.serverData,
-      endActiveMap: mapControl.end,
+      endActiveMap: () => mapControl.end(self.openMap),
       launchNewMap: mapControl.launch,
       mapId: self.mapId,
       topicId: self.topicId
@@ -159,7 +159,7 @@ const ReactApp = {
       openTopic: TopicCard.openTopic,
       metacodeSets: self.metacodeSets,
       updateTopic: (topic, obj) => topic.save(obj),
-      onTopicFollow: Topic.onTopicFollow // todo
+      onTopicFollow: () => {} // Topic.onTopicFollow // todo
     }
   },
   getTopicProps: function() {
