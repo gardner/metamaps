@@ -55,6 +55,25 @@ const TopicCard = {
       }
     })
   },
+  removeAttachment: (topic) => {
+    const attachments = topic.get('attachments')
+    if (!attachments || attachments.length < 1) {
+      return
+    }
+
+    $.ajax({
+      url: `/attachments/${attachments[0].id}`,
+      type: 'DELETE',
+      success: () => {
+        topic.fetch()
+      },
+      error: error => {
+        console.error(error)
+        alert("Failed to remove attachment"),
+        topic.fetch()
+      }
+    })
+  },
   render: function() {
     ReactApp.render()
   },

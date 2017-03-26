@@ -16,6 +16,7 @@ class ReactTopicCard extends Component {
 
     const wrappedUpdateTopic = obj => updateTopic(topic, obj)
     const wrappedUploadAttachment = file => uploadAttachment(topic, file)
+    const wrappedRemoveAttachment = () => removeAttachment(topic)
     const wrappedTopicFollow = () => onTopicFollow(topic)
 
     const authorizedToEdit = topic.authorizeToEdit(currentUser)
@@ -53,6 +54,7 @@ class ReactTopicCard extends Component {
               authorizedToEdit={authorizedToEdit}
               updateTopic={wrappedUpdateTopic}
               uploadAttachment={wrappedUploadAttachment}
+              removeAttachment={wrappedRemoveAttachment}
             />
           {Util.isTester(currentUser) && <Follow isFollowing={isFollowing} onTopicFollow={wrappedTopicFollow} />}
             <div className="clearfloat"></div>

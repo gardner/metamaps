@@ -37,7 +37,8 @@ class Attachments extends Component {
   render = () => {
     const { topic, authorizedToEdit, updateTopic } = this.props
     const link = topic.get('link')
-    const file = topic.get('attachment')
+    const attachments = topic.get('attachments')
+    const file = attachments && attachments.length ? attachments[0] : null
 
     let childComponent
     if (link) {
@@ -48,7 +49,7 @@ class Attachments extends Component {
         />
       )
     } else if (file) {
-      childComponent = null
+      childComponent = <div>{JSON.stringify(file)}</div>
     } else if (!authorizedToEdit) {
       childComponent = null
     } else if (this.state.addingPhoto) {
@@ -101,7 +102,8 @@ Attachments.propTypes = {
   topic: PropTypes.object, // Backbone object
   authorizedToEdit: PropTypes.bool,
   updateTopic: PropTypes.func,
-  uploadAttachment: PropTypes.func
+  uploadAttachment: PropTypes.func,
+  removeAttachment: PropTypes.func
 }
 
 export default Attachments

@@ -71,6 +71,7 @@ class Topic < ApplicationRecord
   def attachments_json
     attachments.map do |a|
       {
+        id: a.id,
         file_name: a.file_file_name,
         content_type: a.file_content_type,
         file_size: a.file_file_size,
