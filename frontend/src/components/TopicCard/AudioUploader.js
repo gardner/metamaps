@@ -21,17 +21,28 @@ class AudioUploader extends Component {
     const filename = `metamaps-recorded-audio-${date}.webm`
     const file = new File([blob], filename, { type: 'video/webm', lastModifiedDate: now })
 
-    this.props.uploadAttachment(file)
+    this.props.uploadAttachment(file).then(success => {
+      if (!success) {
+        this.command('none')
+      }
+    })
   }
 
   render() {
     return (
       <div className="audio-uploader">
         <Recorder command={this.state.command} onStop={this.onStop} />
-        <div className="start" onClick={this.command('start')}>Start</div>
-        <div className="stop" onClick={this.command('stop')}>Stop</div>
         {this.state.command === 'start' && (
-          <span>Recording...</span>
+          <div className="upload-audio-recording">
+            <div className="stop upload-audio-stop" onClick={this.command('stop')}>Stop</div>
+            Recording...
+          </div>
+        )}
+        {this.state.command === 'none' && (
+          <div className="start upload-audio-start" onClick={this.command('start')}>
+            Click to record <br />
+            (max 30 seconds)
+          </div>
         )}
         <div className="attachment-cancel" onClick={this.props.cancel} />
       </div>

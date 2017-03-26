@@ -38,21 +38,29 @@ const TopicCard = {
     data.append('attachment[file]', file)
     data.append('attachment[attachable_type]', 'Topic')
     data.append('attachment[attachable_id]', topic.id)
-    $.ajax({
-      url: '/attachments',
-      type: 'POST',
-      data,
-      processData: false,
-      contentType: false,
-      success: (data) => {
-        console.log("file upolad success", data)
-        topic.fetch({ success: () => ReactApp.render() })
-      },
-      error: (error) => {
-        console.error(error)
-        alert("File upload failed")
-        topic.fetch({ success: () => ReactApp.render() })
-      }
+    return new Promise((resolve, reject) => {
+      $.ajax({
+        url: '/attachments',
+        type: 'POST',
+        data,
+        processData: false,
+        contentType: false,
+        success: (data) => {
+          console.log("file upolad success", data)
+          topic.fetch({ success: () => {
+            ReactApp.render()
+            resolve(true)
+          }})
+        },
+        error: (error) => {
+          console.error(error)
+          alert("File upload failed")
+          topic.fetch({ success: () => {
+            ReactApp.render()
+            resolve(false)
+          }})
+        }
+      })
     })
   },
   removeAttachment: (topic) => {

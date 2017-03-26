@@ -25,12 +25,6 @@ class Attachments extends Component {
     this.setState(this.defaultState)
   }
 
-  clearAttachments = () => {
-    this.props.updateTopic({ link: null })
-    this.props.removeAttachment()
-    this.clearState()
-  }
-
   // onClick handler for the 4 buttons, which triggers showing the proper uploader
   choose = key => () => {
     this.setState(Object.assign({}, this.defaultState, { [key]: true }))
@@ -69,21 +63,21 @@ class Attachments extends Component {
     } else if (this.state.addingLink) {
       childComponent = (
         <EmbedlyLinkChooser updateTopic={updateTopic}
-          cancel={this.clearAttachments}
+          cancel={this.clearState}
         />
       )
     } else if (this.state.addingAudio) {
       childComponent = (
         <AudioUploader updateTopic={updateTopic}
           uploadAttachment={this.props.uploadAttachment}
-          cancel={this.clearAttachments}
+          cancel={this.clearState}
         />
       )
     } else if (this.state.addingFile) {
       childComponent = (
         <FileUploader updateTopic={updateTopic}
           uploadAttachment={this.props.uploadAttachment}
-          cancel={this.clearAttachments}
+          cancel={this.clearState}
         />
       )
     } else {
