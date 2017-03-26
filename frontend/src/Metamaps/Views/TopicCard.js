@@ -33,6 +33,11 @@ const TopicCard = {
     const self = TopicCard
     topic.save(obj, { success: self.render })
   },
+  uploadAttachment: (file) => {
+    console.log(file)
+    alert("unimplemented")
+    $.post
+  },
   render: function() {
     ReactApp.render()
   },
@@ -48,7 +53,7 @@ const TopicCard = {
           $(this).height('auto')
         }
       })
-      opts.complete && opts.complete()
+      if (opts.complete) opts.complete()
     })
   },
   hideCard: function() {

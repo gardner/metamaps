@@ -51,6 +51,7 @@ class ReactTopicCard extends Component {
               topic={topic}
               authorizedToEdit={authorizedToEdit}
               updateTopic={wrappedUpdateTopic}
+              uploadAttachment={this.props.uploadAttachment}
             />
           {Util.isTester(currentUser) && <Follow isFollowing={isFollowing} onTopicFollow={wrappedTopicFollow} />}
             <div className="clearfloat"></div>
@@ -74,7 +75,8 @@ ReactTopicCard.propTypes = {
       name: PropTypes.string
     }))
   })),
-  redrawCanvas: PropTypes.func
+  redrawCanvas: PropTypes.func,
+  uploadAttachment: PropTypes.func
 }
 
 export default ReactTopicCard

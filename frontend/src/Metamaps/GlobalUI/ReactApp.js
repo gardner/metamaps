@@ -150,6 +150,7 @@ const ReactApp = {
       openTopic: TopicCard.openTopic,
       metacodeSets: TopicCard.metacodeSets,
       updateTopic: TopicCard.updateTopic,
+      uploadAttachment: TopicCard.uploadAttachment,
       onTopicFollow: TopicCard.onTopicFollow,
       redrawCanvas: TopicCard.redrawCanvas
     }

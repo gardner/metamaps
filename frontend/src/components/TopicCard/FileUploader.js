@@ -3,8 +3,11 @@ import Dropzone from 'react-dropzone'
 
 class FileUploader extends Component {
   handleFileUpload = (acceptedFiles, rejectedFiles) => {
-    console.log("unimplemented")
-    this.props.cancel()
+    if (acceptedFiles.length >= 1) {
+      this.props.uploadAttachment(acceptedFiles[0])
+    } else {
+      alert("File upload failed, please try again.")
+    }
   }
 
   render() {
@@ -24,6 +27,7 @@ class FileUploader extends Component {
 
 FileUploader.propTypes = {
   updateTopic: PropTypes.func,
+  uploadAttachment: PropTypes.func,
   cancel: PropTypes.func
 }
 

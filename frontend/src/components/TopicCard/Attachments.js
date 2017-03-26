@@ -54,6 +54,7 @@ class Attachments extends Component {
     } else if (this.state.addingPhoto) {
       childComponent = (
         <PhotoUploader updateTopic={updateTopic}
+          uploadAttachment={this.props.uploadAttachment}
           cancel={this.clearAttachments}
         />
       )
@@ -66,12 +67,14 @@ class Attachments extends Component {
     } else if (this.state.addingAudio) {
       childComponent = (
         <AudioUploader updateTopic={updateTopic}
+          uploadAttachment={this.props.uploadAttachment}
           cancel={this.clearAttachments}
         />
       )
     } else if (this.state.addingFile) {
       childComponent = (
         <FileUploader updateTopic={updateTopic}
+          uploadAttachment={this.props.uploadAttachment}
           cancel={this.clearAttachments}
         />
       )
@@ -97,7 +100,8 @@ class Attachments extends Component {
 Attachments.propTypes = {
   topic: PropTypes.object, // Backbone object
   authorizedToEdit: PropTypes.bool,
-  updateTopic: PropTypes.func
+  updateTopic: PropTypes.func,
+  uploadAttachment: PropTypes.func
 }
 
 export default Attachments
