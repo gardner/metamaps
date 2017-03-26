@@ -26,7 +26,8 @@ class Attachments extends Component {
   }
 
   clearAttachments = () => {
-    this.props.updateTopic({ link: null }) // attachments too
+    this.props.updateTopic({ link: null })
+    this.props.removeAttachment()
     this.clearState()
   }
 

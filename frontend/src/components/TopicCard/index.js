@@ -9,7 +9,10 @@ import Util from '../../Metamaps/Util'
 
 class ReactTopicCard extends Component {
   render = () => {
-    const { currentUser, onTopicFollow, updateTopic, uploadAttachment } = this.props
+    const {
+      currentUser, onTopicFollow, updateTopic, uploadAttachment,
+      removeAttachment
+    } = this.props
     const topic = this.props.openTopic
 
     if (!topic) return null

@@ -44,6 +44,7 @@ class FileAttachment extends Component {
           />
           {file.file_name}
         </a>
+        <div className="attachment-cancel" onClick={this.props.removeAttachment} />
       </div>
     )
   }

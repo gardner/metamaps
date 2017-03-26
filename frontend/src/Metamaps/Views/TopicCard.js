@@ -45,13 +45,13 @@ const TopicCard = {
       processData: false,
       contentType: false,
       success: (data) => {
-        console.log(data)
-        topic.fetch()
+        console.log("file upolad success", data)
+        topic.fetch({ success: () => ReactApp.render() })
       },
       error: (error) => {
         console.error(error)
         alert("File upload failed")
-        topic.fetch()
+        topic.fetch({ success: () => ReactApp.render() })
       }
     })
   },
@@ -65,12 +65,13 @@ const TopicCard = {
       url: `/attachments/${attachments[0].id}`,
       type: 'DELETE',
       success: () => {
-        topic.fetch()
+        console.log("delete success, syncing topic")
+        topic.fetch({ success: () => ReactApp.render() })
       },
       error: error => {
         console.error(error)
         alert("Failed to remove attachment"),
-        topic.fetch()
+        topic.fetch({ success: () => ReactApp.render() })
       }
     })
   },

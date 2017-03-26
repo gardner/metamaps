@@ -26,7 +26,7 @@ class AttachmentsController < ApplicationController
   private
 
   def set_attachment
-    @attachments = Attachment.find(params[:id])
+    @attachment = Attachment.find(params[:id])
     authorize @attachment
   end
 
