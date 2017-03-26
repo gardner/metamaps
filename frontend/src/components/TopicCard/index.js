@@ -9,12 +9,13 @@ import Util from '../../Metamaps/Util'
 
 class ReactTopicCard extends Component {
   render = () => {
-    const { currentUser, onTopicFollow, updateTopic } = this.props
+    const { currentUser, onTopicFollow, updateTopic, uploadAttachment } = this.props
     const topic = this.props.openTopic
 
     if (!topic) return null
 
     const wrappedUpdateTopic = obj => updateTopic(topic, obj)
+    const wrappedUploadAttachment = file => uploadAttachment(topic, file)
     const wrappedTopicFollow = () => onTopicFollow(topic)
 
     const authorizedToEdit = topic.authorizeToEdit(currentUser)
@@ -51,7 +52,7 @@ class ReactTopicCard extends Component {
               topic={topic}
               authorizedToEdit={authorizedToEdit}
               updateTopic={wrappedUpdateTopic}
-              uploadAttachment={this.props.uploadAttachment}
+              uploadAttachment={wrappedUploadAttachment}
             />
           {Util.isTester(currentUser) && <Follow isFollowing={isFollowing} onTopicFollow={wrappedTopicFollow} />}
             <div className="clearfloat"></div>

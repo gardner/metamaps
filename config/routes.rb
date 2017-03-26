@@ -6,6 +6,8 @@ Metamaps::Application.routes.draw do
   root to: 'main#home', via: :get
   get 'request', to: 'main#requestinvite', as: :request
 
+  resources :attachments, only: [:create, :destroy], shallow: true
+
   namespace :explore do
     get 'active'
     get 'featured'
@@ -89,7 +91,6 @@ Metamaps::Application.routes.draw do
       post :follow, default: { format: :json }
       post :unfollow, default: { format: :json }
       get  :unfollow_from_email
-      resources :attachments, only: [:create, :destroy], shallow: true
     end
     collection do
       get :autocomplete_topic

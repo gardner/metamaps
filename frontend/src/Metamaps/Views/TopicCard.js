@@ -33,10 +33,27 @@ const TopicCard = {
     const self = TopicCard
     topic.save(obj, { success: self.render })
   },
-  uploadAttachment: (file) => {
-    console.log(file)
-    alert("unimplemented")
-    $.post
+  uploadAttachment: (topic, file) => {
+    const data = new FormData()
+    data.append('attachment[file]', file)
+    data.append('attachment[attachable_type]', 'Topic')
+    data.append('attachment[attachable_id]', topic.id)
+    $.ajax({
+      url: '/attachments',
+      type: 'POST',
+      data,
+      processData: false,
+      contentType: false,
+      success: (data) => {
+        console.log(data)
+        topic.fetch()
+      },
+      error: (error) => {
+        console.error(error)
+        alert("File upload failed")
+        topic.fetch()
+      }
+    })
   },
   render: function() {
     ReactApp.render()
