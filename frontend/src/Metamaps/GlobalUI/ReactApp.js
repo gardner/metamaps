@@ -151,7 +151,7 @@ const ReactApp = {
       metacodeSets: TopicCard.metacodeSets,
       updateTopic: TopicCard.updateTopic,
       uploadAttachment: TopicCard.uploadAttachment,
-      removeAttachment: TopciCard.removeAttachment,
+      removeAttachment: TopicCard.removeAttachment,
       onTopicFollow: TopicCard.onTopicFollow,
       redrawCanvas: TopicCard.redrawCanvas
     }

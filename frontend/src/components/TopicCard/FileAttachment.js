@@ -1,7 +1,7 @@
 import React, { Component, PropTypes } from 'react'
 import Dropzone from 'react-dropzone'
 
-class FileAttachments extends Component {
+class FileAttachment extends Component {
   getFileTypeClass = content_type => {
     if (content_type === 'text/plain') {
       return 'text-file-type'
@@ -31,14 +31,10 @@ class FileAttachments extends Component {
     }
   }
 
-  handleFileUpload = (acceptedFiles, rejectedFiles) => {
-    console.log("unimplemented")
-  }
-
-  renderFile = (file, index) => {
+  render() {
+    const { file } = this.props
     return (
-      <div key={index} 
-        className={`file ${this.getFileTypeClass(file.content_type)}`}
+      <div className={`file ${this.getFileTypeClass(file.content_type)}`}
         style={{ clear: 'both' }}
       >
         <a href={file.url}>
@@ -51,34 +47,17 @@ class FileAttachments extends Component {
       </div>
     )
   }
-
-  render() {
-    return (
-      <div className="file-attachments">
-        {this.props.attachments.map(this.renderFile)}
-        {this.props.authorizedToEdit && (
-          <div className="upload-file" style={{ borderTop: '2px dashed black' }}>
-            <Dropzone onDrop={this.handleFileUpload}
-              style={{ height: '2em', paddingLeft: '0.5em' }}
-            >
-              Upload file attachments here
-            </Dropzone>
-          </div>
-        )}
-      </div>
-    )
-  }
 }
 
-FileAttachments.propTypes = {
-  attachments: PropTypes.arrayOf(PropTypes.shape({
+
+FileAttachment.propTypes = {
+  file: PropTypes.shape({
     content_type: PropTypes.string,
     file_name: PropTypes.string,
-    file_size: PropTypes.number,
     url: PropTypes.string
-  })),
+  }),
   authorizedToEdit: PropTypes.bool,
-  updateTopic: PropTypes.func
+  removeAttachment: PropTypes.func
 }
 
-export default FileAttachments
+export default FileAttachment

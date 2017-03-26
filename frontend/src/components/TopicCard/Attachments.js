@@ -5,6 +5,7 @@ import EmbedlyCard from './EmbedlyCard'
 import FileUploader from './FileUploader'
 import PhotoUploader from './PhotoUploader'
 import AudioUploader from './AudioUploader'
+import FileAttachment from './FileAttachment'
 
 class Attachments extends Component {
   constructor(props) {
@@ -49,7 +50,12 @@ class Attachments extends Component {
         />
       )
     } else if (file) {
-      childComponent = <div>{JSON.stringify(file)}</div>
+      childComponent = (
+        <FileAttachment file={file}
+          authorizedToEdit={authorizedToEdit}
+          removeAttachment={this.props.removeAttachment}
+        />
+      )
     } else if (!authorizedToEdit) {
       childComponent = null
     } else if (this.state.addingPhoto) {
