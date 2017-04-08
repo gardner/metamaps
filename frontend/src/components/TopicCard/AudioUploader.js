@@ -34,8 +34,8 @@ class AudioUploader extends Component {
         <Recorder command={this.state.command} onStop={this.onStop} />
         {this.state.command === 'start' && (
           <div className="upload-audio-recording">
-            <div className="stop upload-audio-stop" onClick={this.command('stop')}>Stop</div>
-            Recording...
+            <div className="stop upload-audio-stop" onClick={this.command('stop')} />
+            <div className="upload-audio-recording-text">&nbsp;&nbsp;Recording...</div>
           </div>
         )}
         {this.state.command === 'none' && (

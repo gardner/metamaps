@@ -648,6 +648,21 @@ background-color: #E0E0E0;
   padding-top: 0.75em;
 }
 
+.upload-audio-recording {
+  font-size: small;
+  color: #aaa;
+  text-align: center;
+}
+
+$recording_button_size: 48px;
+.upload-audio-stop {
+  background-image: url(<%= asset_path('recording-button.png') %>);
+  background-size: $recording_button_size;
+  width: $recording_button_size;
+  height: $recording_button_size;
+  margin: 0 auto;
+}
+
 .CardOnGraph .attachment-type-chooser {
   padding-top: .75em;
 
