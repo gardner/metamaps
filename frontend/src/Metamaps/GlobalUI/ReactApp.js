@@ -35,12 +35,14 @@ const ReactApp = {
   mobile: false,
   mobileTitle: '',
   mobileTitleWidth: 0,
+  metacodeSets: [],
   init: function(serverData, openLightbox) {
     const self = ReactApp
     self.serverData = serverData
     self.unreadNotificationsCount = serverData.unreadNotificationsCount
     self.mobileTitle = serverData.mobileTitle
     self.openLightbox = openLightbox
+    self.metacodeSets = serverData.metacodeSets
     routes = makeRoutes(serverData.ActiveMapper)
     self.resize()
     window && window.addEventListener('resize', self.resize)
@@ -147,13 +149,12 @@ const ReactApp = {
   getTopicCardProps: function() {
     const self = ReactApp
     return {
+      metacodeSets: self.metacodeSets,
+      onTopicFollow: Topic.onTopicFollow,
       openTopic: TopicCard.openTopic,
-      metacodeSets: TopicCard.metacodeSets,
-      updateTopic: TopicCard.updateTopic,
+      updateTopic: (topic, obj) => topic.save(obj),
       uploadAttachment: TopicCard.uploadAttachment,
-      removeAttachment: TopicCard.removeAttachment,
-      onTopicFollow: TopicCard.onTopicFollow,
-      redrawCanvas: TopicCard.redrawCanvas
+      removeAttachment: TopicCard.removeAttachment
     }
   },
   getTopicProps: function() {

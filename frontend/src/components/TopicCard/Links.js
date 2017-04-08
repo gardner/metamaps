@@ -25,7 +25,8 @@ class Links extends Component {
     this.props.updateTopic({
       metacode_id: metacodeId
     })
-    this.props.redrawCanvas()
+    // this needs to trigger a redraw of the canvas,
+    // which it currently does using backbone. If backbone comes out, make sure it still does
   }
 
   toggleShowMoreMaps = e => {
@@ -88,7 +89,7 @@ class Links extends Component {
         <div className="linkItem icon metacodeItem"
           style={{ zIndex: this.state.showMetacodeTitle ? 4 : 1 }}
           onMouseLeave={() => this.setState({ showMetacodeTitle: false, showMetacodeSelect: false })}
-          onClick={this.handleMetacodeBarClick}
+          onClick={() => authorizedToEdit && this.handleMetacodeBarClick()}
         >
           <div className={`metacodeTitle mbg${metacode.get('id')}`}
             style={{ display: this.state.showMetacodeTitle ? 'block' : 'none' }}
@@ -155,8 +156,7 @@ Links.propTypes = {
       icon_path: PropTypes.string, // url
       name: PropTypes.string
     }))
-  })),
-  redrawCanvas: PropTypes.func
+  }))
 }
 
 export default Links
