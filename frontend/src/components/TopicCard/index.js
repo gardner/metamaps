@@ -58,6 +58,8 @@ class ReactTopicCard extends Component {
                 topic={topic}
                 authorizedToEdit={authorizedToEdit}
                 updateTopic={wrappedUpdateTopic}
+                uploadAttachment={wrappedUploadAttachment}
+                removeAttachment={wrappedRemoveAttachment}
               />
             {Util.isTester(currentUser) && <Follow isFollowing={isFollowing} onTopicFollow={wrappedTopicFollow} />}
               <div className="clearfloat"></div>

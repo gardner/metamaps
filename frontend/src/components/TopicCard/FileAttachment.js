@@ -9,7 +9,9 @@ class FileAttachment extends Component {
       return 'pdf-file-type'
     } else if (content_type.match(/^image\//)) {
       return 'image-file-type'
-    } else if (content_type.match(/^audio\//) || content_type === 'video/ogg') {
+    } else if (content_type.match(/^audio\//) ||
+               content_type === 'video/ogg' ||
+               content_type === 'video/webm') {
       return 'audio-file-type'
     } else {
       return 'unknown-file-type'
@@ -17,17 +19,19 @@ class FileAttachment extends Component {
   }
 
   getFileIcon = file => {
-    // TODO these icons are not suitable for use - get real ones
+    // TODO move these icons onto our server
     if (file.content_type === 'text/plain') {
-      return 'http://www.iconsdb.com/icons/preview/black/text-file-xxl.png'
+      return 'http://useiconic.com/open-iconic/svg/file.svg'
     } else if (file.content_type === 'application/pdf') {
-      return 'https://image.flaticon.com/icons/svg/29/29587.svg'
+      return 'http://useiconic.com/open-iconic/svg/document.svg'
     } else if (file.content_type.match(/^image\//)) {
-      return file.url
-    } else if (file.content_type.match(/^audio\//) || file.content_type === 'video/ogg') {
-      return 'https://cdn0.iconfinder.com/data/icons/huge-business-vector-icons/60/music_notes-512.png'
+      return 'http://useiconic.com/open-iconic/svg/image.svg'
+    } else if (file.content_type.match(/^audio\//) ||
+               file.content_type === 'video/ogg' ||
+               file.content_type === 'video/webm') {
+      return 'http://useiconic.com/open-iconic/svg/musical-note.svg'
     } else {
-      return 'https://image.flaticon.com/icons/png/512/8/8235.png'
+      return 'http://useiconic.com/open-iconic/svg/question-mark.svg'
     }
   }
 
