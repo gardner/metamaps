@@ -60,6 +60,7 @@ class ReactTopicCard extends Component {
                 updateTopic={wrappedUpdateTopic}
                 uploadAttachment={wrappedUploadAttachment}
                 removeAttachment={wrappedRemoveAttachment}
+                fileTypeIcons={this.props.fileTypeIcons}
               />
             {Util.isTester(currentUser) && <Follow isFollowing={isFollowing} onTopicFollow={wrappedTopicFollow} />}
               <div className="clearfloat"></div>
@@ -85,7 +86,8 @@ ReactTopicCard.propTypes = {
     }))
   })),
   redrawCanvas: PropTypes.func,
-  uploadAttachment: PropTypes.func
+  uploadAttachment: PropTypes.func,
+  fileTypeIcons: PropTypes.objectOf(PropTypes.string)
 }
 
 export default ReactTopicCard

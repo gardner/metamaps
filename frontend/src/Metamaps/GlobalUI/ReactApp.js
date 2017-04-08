@@ -36,6 +36,7 @@ const ReactApp = {
   mobileTitle: '',
   mobileTitleWidth: 0,
   metacodeSets: [],
+  attachmentFileTypeIcons: {},
   init: function(serverData, openLightbox) {
     const self = ReactApp
     self.serverData = serverData
@@ -43,6 +44,7 @@ const ReactApp = {
     self.mobileTitle = serverData.mobileTitle
     self.openLightbox = openLightbox
     self.metacodeSets = serverData.metacodeSets
+    self.attachmentFileTypeIcons = serverData.attachmentFileTypeIcons
     routes = makeRoutes(serverData.ActiveMapper)
     self.resize()
     window && window.addEventListener('resize', self.resize)
@@ -154,7 +156,8 @@ const ReactApp = {
       openTopic: TopicCard.openTopic,
       updateTopic: (topic, obj) => topic.save(obj),
       uploadAttachment: TopicCard.uploadAttachment,
-      removeAttachment: TopicCard.removeAttachment
+      removeAttachment: TopicCard.removeAttachment,
+      fileTypeIcons: self.attachmentFileTypeIcons
     }
   },
   getTopicProps: function() {

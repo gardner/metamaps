@@ -18,21 +18,13 @@ class FileAttachment extends Component {
     }
   }
 
-  fileTypeIcons = {
-    text: 'http://useiconic.com/open-iconic/svg/file.svg',
-    pdf: 'http://useiconic.com/open-iconic/svg/document.svg',
-    image: 'http://useiconic.com/open-iconic/svg/image.svg',
-    audio: 'http://useiconic.com/open-iconic/svg/musical-note.svg',
-    unknown: 'http://useiconic.com/open-iconic/svg/question-mark.svg'
-  }
-
   getFileIcon = file => {
     const type = this.getFileType(file.content_type)
 
-    if (this.fileTypeIcons[type]) {
-      return this.fileTypeIcons[type]
+    if (this.props.fileTypeIcons[type]) {
+      return this.props.fileTypeIcons[type]
     } else {
-      return this.fileTypeIcons[unknown]
+      return this.props.fileTypeIcons[unknown]
     }
   }
 
@@ -60,7 +52,8 @@ FileAttachment.propTypes = {
     url: PropTypes.string
   }),
   authorizedToEdit: PropTypes.bool,
-  removeAttachment: PropTypes.func
+  removeAttachment: PropTypes.func,
+  fileTypeIcons: PropTypes.objectOf(PropTypes.string)
 }
 
 export default FileAttachment

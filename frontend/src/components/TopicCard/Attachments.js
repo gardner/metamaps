@@ -49,6 +49,7 @@ class Attachments extends Component {
         <FileAttachment file={file}
           authorizedToEdit={authorizedToEdit}
           removeAttachment={this.props.removeAttachment}
+          fileTypeIcons={this.props.fileTypeIcons}
         />
       )
     } else if (!authorizedToEdit) {
@@ -104,7 +105,8 @@ Attachments.propTypes = {
   authorizedToEdit: PropTypes.bool,
   updateTopic: PropTypes.func,
   uploadAttachment: PropTypes.func,
-  removeAttachment: PropTypes.func
+  removeAttachment: PropTypes.func,
+  fileTypeIcons: PropTypes.objectOf(PropTypes.string)
 }
 
 export default Attachments
