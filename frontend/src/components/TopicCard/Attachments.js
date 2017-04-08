@@ -57,7 +57,7 @@ class Attachments extends Component {
       childComponent = (
         <PhotoUploader updateTopic={updateTopic}
           uploadAttachment={this.props.uploadAttachment}
-          cancel={this.clearAttachments}
+          cancel={this.clearState}
         />
       )
     } else if (this.state.addingLink) {
