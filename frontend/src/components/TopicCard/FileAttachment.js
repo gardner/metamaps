@@ -2,43 +2,44 @@ import React, { Component, PropTypes } from 'react'
 import Dropzone from 'react-dropzone'
 
 class FileAttachment extends Component {
-  getFileTypeClass = content_type => {
+  getFileType = content_type => {
     if (content_type === 'text/plain') {
-      return 'text-file-type'
+      return 'text'
     } else if (content_type === 'application/pdf') {
-      return 'pdf-file-type'
+      return 'pdf'
     } else if (content_type.match(/^image\//)) {
-      return 'image-file-type'
+      return 'image'
     } else if (content_type.match(/^audio\//) ||
                content_type === 'video/ogg' ||
                content_type === 'video/webm') {
-      return 'audio-file-type'
+      return 'audio'
     } else {
-      return 'unknown-file-type'
+      return 'unknown'
     }
   }
 
+  fileTypeIcons = {
+    text: 'http://useiconic.com/open-iconic/svg/file.svg',
+    pdf: 'http://useiconic.com/open-iconic/svg/document.svg',
+    image: 'http://useiconic.com/open-iconic/svg/image.svg',
+    audio: 'http://useiconic.com/open-iconic/svg/musical-note.svg',
+    unknown: 'http://useiconic.com/open-iconic/svg/question-mark.svg'
+  }
+
   getFileIcon = file => {
-    // TODO move these icons onto our server
-    if (file.content_type === 'text/plain') {
-      return 'http://useiconic.com/open-iconic/svg/file.svg'
-    } else if (file.content_type === 'application/pdf') {
-      return 'http://useiconic.com/open-iconic/svg/document.svg'
-    } else if (file.content_type.match(/^image\//)) {
-      return 'http://useiconic.com/open-iconic/svg/image.svg'
-    } else if (file.content_type.match(/^audio\//) ||
-               file.content_type === 'video/ogg' ||
-               file.content_type === 'video/webm') {
-      return 'http://useiconic.com/open-iconic/svg/musical-note.svg'
+    const type = this.getFileType(file.content_type)
+
+    if (this.fileTypeIcons[type]) {
+      return this.fileTypeIcons[type]
     } else {
-      return 'http://useiconic.com/open-iconic/svg/question-mark.svg'
+      return this.fileTypeIcons[unknown]
     }
   }
 
   render() {
     const { file } = this.props
     return (
-      <div className={`file ${this.getFileTypeClass(file.content_type)}`}
+      <div className={`file ${this.getFileType(file.content_type)}-file-type`}
         style={{ clear: 'both' }}
       >
         <a href={file.url}>
