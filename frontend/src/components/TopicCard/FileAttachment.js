@@ -43,10 +43,7 @@ class FileAttachment extends Component {
         style={{ clear: 'both' }}
       >
         <a href={file.url}>
-          <img src={this.getFileIcon(file)}
-            width="16" height="16"
-            style={{ float: 'left', paddingLeft: '0.5em', paddingRight: '0.5em' }}
-          />
+          <img src={this.getFileIcon(file)} className="filetype-icon" />
           {file.file_name}
         </a>
         <div className="attachment-cancel" onClick={this.props.removeAttachment} />
