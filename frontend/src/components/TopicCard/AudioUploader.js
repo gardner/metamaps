@@ -11,7 +11,19 @@ class AudioUploader extends Component {
     }
   }
 
+  timeLimit30sTimeoutId = null
+
+  enforce30sTimeLimit = cmd => {
+    window.clearTimeout(this.timeLimit30sTimeoutId)
+    if (cmd === 'start') {
+      this.timeLimit30sTimeoutId = window.setTimeout(() => {
+        this.command('stop')()
+      }, 30000)
+    }
+  }
+
   command = cmd => () => {
+    this.enforce30sTimeLimit(cmd)
     this.setState({ command: cmd })
   }
 
@@ -28,10 +40,17 @@ class AudioUploader extends Component {
     })
   }
 
+  handleRecordingError = () => {
+    alert('Audio recording failed. Some possible problems include: not using an HTTPS connection, outdated browser, or you need to reload the page.');
+  }
+
   render() {
     return (
       <div className="audio-uploader">
-        <Recorder command={this.state.command} onStop={this.onStop} />
+        <Recorder command={this.state.command}
+          onStop={this.onStop}
+          onError={this.handleRecordingError}
+        />
         {this.state.command === 'start' && (
           <div className="upload-audio-recording">
             <div className="stop upload-audio-stop" onClick={this.command('stop')} />
