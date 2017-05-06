@@ -1,7 +1,7 @@
 /* global describe, it */
 import React from 'react'
 import TestUtils from 'react-addons-test-utils' // ES6
-import ImportDialogBox from '../../src/components/ImportDialogBox.js'
+import ImportDialogBox from '../../../src/components/ImportDialogBox.js'
 import Dropzone from 'react-dropzone'
 import chai from 'chai'
 
