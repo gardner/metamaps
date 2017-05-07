@@ -55,6 +55,34 @@ function assertContent({ currentUser, map }) {
   })
 }
 
+function assertStarLogic({ mapIsStarred }) {
+  const onMapStar = sinon.spy()
+  const onMapUnstar = sinon.spy()
+  const wrapper = shallow(
+    <InfoAndHelp map={{}} currentUser={{}}
+      onMapStar={onMapStar}
+      onMapUnstar={onMapUnstar}
+      mapIsStarred={mapIsStarred}
+    />)
+  const starWrapper = wrapper.find('.starMap')
+  starWrapper.simulate('click')
+  if (mapIsStarred) {
+    it('has unstar content', () => {
+      expect(starWrapper.hasClass('starred')).to.equal(true)
+      expect(starWrapper.find('.tooltipsAbove').text()).to.equal('Unstar')
+      expect(onMapStar).to.have.property('callCount', 0)
+      expect(onMapUnstar).to.have.property('callCount', 1)
+    })
+  } else {
+    it('has star content', () => {
+      expect(starWrapper.hasClass('starred')).to.equal(false)
+      expect(starWrapper.find('.tooltipsAbove').text()).to.equal('Star')
+      expect(onMapStar).to.have.property('callCount', 1)
+      expect(onMapUnstar).to.have.property('callCount', 0)
+    })
+  }
+}
+
 describe('InfoAndHelp', function() {
   describe('no currentUser, map is present', function() {
     assertContent({ currentUser: null, map: {} })
@@ -65,5 +93,6 @@ describe('InfoAndHelp', function() {
   describe('no currentUser, no map', function() {
     assertContent({ currentUser: null, map: null })
   })
+  assertStarLogic({ mapIsStarred: true })
+  assertStarLogic({ mapIsStarred: false })
 })
-
