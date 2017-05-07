@@ -7,7 +7,9 @@ config.externals = config.externals.concat([
   'react/addons',
   'react-test-renderer/shallow',
   'react-dom/test-utils',
-  'canvas'
+  'canvas',
+  'bufferutil',
+  'utf-8-validate'
 ])
 
 module.exports = config
