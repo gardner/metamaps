@@ -19,7 +19,7 @@ describe('ImportDialogBox', function() {
 
   it('has an Export CSV button', () => {
     const wrapper = shallow(<ImportDialogBox onExport={onExport} />)
-    const button = wrapper.find('.export-csv') 
+    const button = wrapper.find('.export-csv')
     expect(button).to.exist
     button.simulate('click')
     expect(csvExport).to.have.property('callCount', 1)
@@ -27,7 +27,7 @@ describe('ImportDialogBox', function() {
 
   it('has an Export JSON button', () => {
     const wrapper = shallow(<ImportDialogBox onExport={onExport} />)
-    const button = wrapper.find('.export-json') 
+    const button = wrapper.find('.export-json')
     expect(button).to.exist
     button.simulate('click')
     expect(jsonExport).to.have.property('callCount', 1)

@@ -1,3 +1,4 @@
+/* global describe, it */
 import React from 'react'
 import { expect } from 'chai'
 import { shallow } from 'enzyme'
@@ -19,7 +20,7 @@ function assertContent({ currentUser, map }) {
     />)
 
   if (map) {
-    it('renders MapInfoBox', () => expect(wrapper.find(MapInfoBox)).to.exist)
+    it('renders MapInfoBox', () => { expect(wrapper.find(MapInfoBox)).to.exist })
     it('renders Map Info icon', () => {
       expect(wrapper.find('.mapInfoIcon')).to.exist
       expect(wrapper.find('.mapInfoIcon .tooltipsAbove').text()).to.equal('Map Info')
@@ -27,8 +28,8 @@ function assertContent({ currentUser, map }) {
       expect(onInfoClick).to.have.property('callCount', 1)
     })
   } else {
-    it('does not render MapInfoBox', () => expect(wrapper.find(MapInfoBox).length).to.equal(0))
-    it('does not render Map Info icon', () => expect(wrapper.find('.mapInfoIcon').length).to.equal(0))
+    it('does not render MapInfoBox', () => { expect(wrapper.find(MapInfoBox).length).to.equal(0) })
+    it('does not render Map Info icon', () => { expect(wrapper.find('.mapInfoIcon').length).to.equal(0) })
   }
 
   if (map && currentUser) {
@@ -38,7 +39,7 @@ function assertContent({ currentUser, map }) {
       expect(onStarClick).to.have.property('callCount', 1)
     })
   } else {
-    it('does not render the Star icon', () => expect(wrapper.find('.starMap').length).to.equal(0))
+    it('does not render the Star icon', () => { expect(wrapper.find('.starMap').length).to.equal(0) })
   }
 
   // common content
