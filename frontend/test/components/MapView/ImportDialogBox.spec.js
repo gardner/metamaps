@@ -26,8 +26,16 @@ describe('ImportDialogBox', function() {
       expect(exporter).to.have.property('callCount', 1)
     })
   }
-  testExportButton('has an Export CSV button', '.export-csv', csvExport)
-  testExportButton('has an Export JSON button', '.export-json', jsonExport)
+  testExportButton({
+    description: 'has an Export CSV button',
+    cssClass: '.export-csv',
+    exporter: csvExport
+  })
+  testExportButton({
+    description: 'has an Export JSON button',
+    cssClass: '.export-json',
+    exporter: jsonExport
+  })
 
   it('has a Download screenshot button', () => {
     const downloadScreenshot = sinon.spy()
