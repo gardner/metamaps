@@ -7,6 +7,15 @@ import sinon from 'sinon'
 import InfoAndHelp from '../../../src/components/common/InfoAndHelp.js'
 import MapInfoBox from '../../../src/components/MapView/MapInfoBox.js'
 
+function assertTooltip({ wrapper, description, cssClass, tooltipText, callback }) {
+  it(description, function() {
+    expect(wrapper.find(cssClass)).to.exist
+    expect(wrapper.find(`${cssClass} .tooltipsAbove`).text()).to.equal(tooltipText)
+    wrapper.find(cssClass).simulate('click')
+    expect(callback).to.have.property('callCount', 1)
+  })
+}
+
 function assertContent({ currentUser, map }) {
   const onInfoClick = sinon.spy()
   const onHelpClick = sinon.spy()
@@ -21,11 +30,12 @@ function assertContent({ currentUser, map }) {
 
   if (map) {
     it('renders MapInfoBox', () => expect(wrapper.find(MapInfoBox)).to.exist)
-    it('renders Map Info icon', () => {
-      expect(wrapper.find('.mapInfoIcon')).to.exist
-      expect(wrapper.find('.mapInfoIcon .tooltipsAbove').text()).to.equal('Map Info')
-      wrapper.find('.mapInfoIcon').simulate('click')
-      expect(onInfoClick).to.have.property('callCount', 1)
+    assertTooltip({
+      wrapper,
+      description: 'renders Map Info icon',
+      cssClass: '.mapInfoIcon',
+      tooltipText: 'Map Info',
+      callback: onInfoClick
     })
   } else {
     it('does not render MapInfoBox', () => expect(wrapper.find(MapInfoBox).length).to.equal(0))
@@ -43,11 +53,12 @@ function assertContent({ currentUser, map }) {
   }
 
   // common content
-  it('renders Help icon', function() {
-    expect(wrapper.find('.openCheatsheet')).to.exist
-    expect(wrapper.find('.openCheatsheet .tooltipsAbove').text()).to.equal('Help')
-    wrapper.find('.openCheatsheet').simulate('click')
-    expect(onHelpClick).to.have.property('callCount', 1)
+  assertTooltip({
+    wrapper,
+    description: 'renders Help icon',
+    cssClass: '.openCheatsheet',
+    tooltipText: 'Help',
+    callback: onHelpClick
   })
   it('renders clearfloat at the end', function() {
     const clearfloat = wrapper.find('.clearfloat')
@@ -67,21 +78,12 @@ function assertStarLogic({ mapIsStarred }) {
     />)
   const starWrapper = wrapper.find('.starMap')
   starWrapper.simulate('click')
-  if (mapIsStarred) {
-    it('has unstar content', () => {
-      expect(starWrapper.hasClass('starred')).to.equal(true)
-      expect(starWrapper.find('.tooltipsAbove').text()).to.equal('Unstar')
-      expect(onMapStar).to.have.property('callCount', 0)
-      expect(onMapUnstar).to.have.property('callCount', 1)
-    })
-  } else {
-    it('has star content', () => {
-      expect(starWrapper.hasClass('starred')).to.equal(false)
-      expect(starWrapper.find('.tooltipsAbove').text()).to.equal('Star')
-      expect(onMapStar).to.have.property('callCount', 1)
-      expect(onMapUnstar).to.have.property('callCount', 0)
-    })
-  }
+  it(mapIsStarred ? 'has unstar content' : 'has star content', () => {
+    expect(starWrapper.hasClass('starred')).to.equal(mapIsStarred)
+    expect(starWrapper.find('.tooltipsAbove').text()).to.equal(mapIsStarred ? 'Unstar' : 'Star')
+    expect(onMapStar).to.have.property('callCount', mapIsStarred ? 0 : 1)
+    expect(onMapUnstar).to.have.property('callCount', mapIsStarred ? 1 : 0)
+  })
 }
 
 describe('InfoAndHelp', function() {

@@ -17,21 +17,17 @@ describe('ImportDialogBox', function() {
     }
   }
 
-  it('has an Export CSV button', () => {
-    const wrapper = shallow(<ImportDialogBox onExport={onExport} />)
-    const button = wrapper.find('.export-csv')
-    expect(button).to.exist
-    button.simulate('click')
-    expect(csvExport).to.have.property('callCount', 1)
-  })
-
-  it('has an Export JSON button', () => {
-    const wrapper = shallow(<ImportDialogBox onExport={onExport} />)
-    const button = wrapper.find('.export-json')
-    expect(button).to.exist
-    button.simulate('click')
-    expect(jsonExport).to.have.property('callCount', 1)
-  })
+  const testExportButton = ({ description, cssClass, exporter }) => {
+    it(description, () => {
+      const wrapper = shallow(<ImportDialogBox onExport={onExport} />)
+      const button = wrapper.find(cssClass)
+      expect(button).to.exist
+      button.simulate('click')
+      expect(exporter).to.have.property('callCount', 1)
+    })
+  }
+  testExportButton('has an Export CSV button', '.export-csv', csvExport)
+  testExportButton('has an Export JSON button', '.export-json', jsonExport)
 
   it('has a Download screenshot button', () => {
     const downloadScreenshot = sinon.spy()
